@@ -1,0 +1,126 @@
+// LOMA — Cozinha e Padaria Artesanal
+// Database schema for the bakery/restaurant website
+// Using SQLite for development portability; see docs/DATABASE.md for PostgreSQL migration
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id           String     @id @default(cuid())
+  name         String
+  slug         String     @unique
+  description  String?
+  displayOrder Int        @default(0)
+  published    Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  menuItems    MenuItem[]
+
+  @@index([displayOrder])
+  @@index([published])
+}
+
+model MenuItem {
+  id              String   @id @default(cuid())
+  categoryId      String
+  category        Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  name            String
+  slug            String   @unique
+  description     String?
+  priceInCents    Int      @default(0) // Safe monetary representation: R$12.50 = 1250
+  imagePath       String?
+  imageAlt        String?
+  displayOrder    Int      @default(0)
+  published       Boolean  @default(false)
+  available       Boolean  @default(true)
+  isVegan         Boolean  @default(false)
+  isChildFriendly Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([displayOrder])
+  @@index([published])
+  @@index([slug])
+}
+
+model MediaAsset {
+  id          String   @id @default(cuid())
+  storagePath String
+  fileName    String
+  mimeType    String
+  fileSize    Int
+  altText     String?
+  attribution String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BusinessSettings {
+  id               String   @id @default("main")
+  businessName     String   @default("LOMA — Cozinha e Padaria Artesanal")
+  brandDescription String   @default("")
+  address          String   @default("")
+  phone            String   @default("")
+  instagramUrl     String   @default("")
+  // Opening hours stored as "HH:MM" strings per day
+  mondayOpen       String?
+  mondayClose      String?
+  tuesdayOpen      String?
+  tuesdayClose     String?
+  wednesdayOpen    String?
+  wednesdayClose   String?
+  thursdayOpen      String?
+  thursdayClose     String?
+  fridayOpen       String?
+  fridayClose      String?
+  saturdayOpen     String?
+  saturdayClose    String?
+  sundayOpen       String?
+  sundayClose      String?
+  // Services
+  hasOutdoorSeating Boolean @default(true)
+  hasVeganOptions   Boolean @default(true)
+  hasChildMenu      Boolean @default(true)
+  // SEO
+  seoTitle         String?
+  seoDescription   String?
+  ogImagePath      String?
+  updatedAt        DateTime @updatedAt
+}
+
+model AdminUser {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  name         String?
+  passwordHash String
+  role         String     @default("admin")
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+
+  @@index([email])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actor      AdminUser @relation(fields: [actorId], references: [id])
+  actorEmail String
+  action     String   // CREATE, UPDATE, DELETE, PUBLISH, UNPUBLISH, LOGIN, LOGOUT
+  entityType String   // Category, MenuItem, MediaAsset, BusinessSettings, AdminUser
+  entityId   String?
+  metadata   String?  // JSON string with minimal change details
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([entityType])
+  @@index([createdAt])
+}
