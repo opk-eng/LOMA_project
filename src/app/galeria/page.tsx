@@ -4,7 +4,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight, Expand, Instagram } from 'lucide-react'
+import { ChevronRight, Expand, Camera } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Galeria',
@@ -120,7 +120,7 @@ export default async function GalleryPage() {
                   ))}
                 </div>
 
-                {/* Instagram link */}
+                {/* Camera link */}
                 <div className="text-center mt-12 pt-8 border-t border-border">
                   <p className="text-charcoal-600 mb-4">
                     Acompanhe mais no nosso Instagram:
@@ -131,7 +131,7 @@ export default async function GalleryPage() {
                     rel="noopener noreferrer"
                     className="btn btn-outline inline-flex items-center gap-2"
                   >
-                    <Instagram className="h-5 w-5" aria-hidden="true" />
+                    <Camera className="h-5 w-5" aria-hidden="true" />
                     @lomacozinha
                     <ChevronRight className="h-4 w-4" aria-hidden="true" />
                   </a>

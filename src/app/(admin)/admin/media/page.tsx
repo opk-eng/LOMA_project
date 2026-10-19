@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react'
 import { uploadImageAction, deleteImageAction, getMediaAssets } from '@/actions/media'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Image, Trash2, Upload, Loader2, Eye, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import Image from 'next/image'
+import { ImageIcon, Trash2, Upload, Loader2, X } from 'lucide-react'
 
 export default function AdminMediaPage() {
   const [assets, setAssets] = useState<Array<{
     id: string
     fileName: string
+    originalName: string | null
     mimeType: string
     fileSize: number
     altText: string | null
@@ -23,20 +24,31 @@ export default function AdminMediaPage() {
   const [altText, setAltText] = useState('')
   const [attribution, setAttribution] = useState('')
 
-  const fetchAssets = async () => {
-    try {
-      const data = await getMediaAssets()
-      setAssets(data)
-    } catch (error) {
-      console.error('Failed to fetch assets:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
+  // Mount-time fetch: setState only inside promise callbacks so we never
+  // update state synchronously in the effect body (avoids cascading renders).
   useEffect(() => {
-    fetchAssets()
+    let ignore = false
+    getMediaAssets()
+      .then((data) => {
+        if (ignore) return
+        setAssets(
+          data.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() }))
+        )
+      })
+      .catch((error) => {
+        if (!ignore) console.error('Failed to fetch assets:', error)
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false)
+      })
+    return () => { ignore = true }
   }, [])
+
+  // Refresh the asset list after a mutation (called from event handlers).
+  const refreshAssets = async () => {
+    const data = await getMediaAssets()
+    setAssets(data.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() })))
+  }
 
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -56,7 +68,7 @@ export default function AdminMediaPage() {
       setShowUpload(false)
       setAltText('')
       setAttribution('')
-      fetchAssets()
+      refreshAssets()
     } else {
       alert(result.error)
     }
@@ -68,7 +80,7 @@ export default function AdminMediaPage() {
     const result = await deleteImageAction(id)
     setDeleting(null)
     if (result.success) {
-      fetchAssets()
+      refreshAssets()
     } else {
       alert(result.error)
     }
@@ -130,7 +142,7 @@ export default function AdminMediaPage() {
           </div>
         ) : assets.length === 0 ? (
           <div className="p-12 text-center text-charcoal-500">
-            <Image className="h-12 w-12 mx-auto text-charcoal-300 mb-3" aria-hidden="true" />
+            <ImageIcon className="h-12 w-12 mx-auto text-charcoal-300 mb-3" aria-hidden="true" />
             <p className="mb-2">Nenhuma imagem enviada</p>
             <Button onClick={() => setShowUpload(true)}>Enviar primeira imagem</Button>
           </div>
@@ -140,20 +152,21 @@ export default function AdminMediaPage() {
               {assets.map((asset) => (
                 <article key={asset.id} className="relative group" role="listitem">
                   <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted relative">
-                    <img
+                    <Image
                       src={`/uploads/${asset.fileName}`}
                       alt={asset.altText || 'Imagem do acervo'}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                      className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-3">
                       <div className="w-full flex justify-between text-white text-xs">
-                        <span className="truncate max-w-[70%]">{asset.altText || asset.fileName}</span>
+                        <span className="truncate max-w-[70%]">{asset.altText || asset.originalName || asset.fileName}</span>
                         <button
                           onClick={() => handleDelete(asset.id)}
                           disabled={deleting === asset.id}
                           className="p-1.5 bg-white/20 backdrop-blur rounded-full hover:bg-white/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                          aria-label={`Excluir ${asset.altText || asset.fileName}`}
+                          aria-label={`Excluir ${asset.altText || asset.originalName || asset.fileName}`}
                         >
                           {deleting === asset.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -165,7 +178,7 @@ export default function AdminMediaPage() {
                     </div>
                   </div>
                   <div className="mt-2 text-xs text-charcoal-500">
-                    <p className="truncate font-medium">{asset.fileName}</p>
+                    <p className="truncate font-medium">{asset.originalName || asset.fileName}</p>
                     <p>{formatSize(asset.fileSize)} • {asset.mimeType}</p>
                   </div>
                 </article>
@@ -178,7 +191,7 @@ export default function AdminMediaPage() {
       {/* Usage Guidelines */}
       <section className="card p-6 bg-terracotta-50 border-terracotta-200" aria-labelledby="guidelines-title">
         <h2 id="guidelines-title" className="font-heading text-lg font-medium text-terracotta-800 mb-4 flex items-center gap-2">
-          <Image className="h-5 w-5" aria-hidden="true" />
+          <ImageIcon className="h-5 w-5" aria-hidden="true" />
           Diretrizes de uso de imagens
         </h2>
         <ul className="text-sm text-terracotta-700 space-y-2" role="list">

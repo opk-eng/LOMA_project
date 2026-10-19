@@ -104,7 +104,7 @@ export async function searchMenuItems(query: string) {
   const items = await prisma.menuItem.findMany({
     where: {
       published: true,
-      name: { contains: query, mode: 'insensitive' },
+      name: { contains: query },
     },
     orderBy: { displayOrder: 'asc' },
     include: {
@@ -139,13 +139,13 @@ export function getTodaysHours(settings: Awaited<ReturnType<typeof getBusinessSe
   const day = brasiliaTime.getDay() // 0 = Sunday
 
   const dayMap: Record<number, { open: string | undefined; close: string | undefined }> = {
-    0: { open: settings.sundayOpen, close: settings.sundayClose },
-    1: { open: settings.mondayOpen, close: settings.mondayClose },
-    2: { open: settings.tuesdayOpen, close: settings.tuesdayClose },
-    3: { open: settings.wednesdayOpen, close: settings.wednesdayClose },
-    4: { open: settings.thursdayOpen, close: settings.thursdayClose },
-    5: { open: settings.fridayOpen, close: settings.fridayClose },
-    6: { open: settings.saturdayOpen, close: settings.saturdayClose },
+    0: { open: settings.sundayOpen ?? undefined, close: settings.sundayClose ?? undefined },
+    1: { open: settings.mondayOpen ?? undefined, close: settings.mondayClose ?? undefined },
+    2: { open: settings.tuesdayOpen ?? undefined, close: settings.tuesdayClose ?? undefined },
+    3: { open: settings.wednesdayOpen ?? undefined, close: settings.wednesdayClose ?? undefined },
+    4: { open: settings.thursdayOpen ?? undefined, close: settings.thursdayClose ?? undefined },
+    5: { open: settings.fridayOpen ?? undefined, close: settings.fridayClose ?? undefined },
+    6: { open: settings.saturdayOpen ?? undefined, close: settings.saturdayClose ?? undefined },
   }
 
   const today = dayMap[day]
@@ -176,7 +176,7 @@ export function getTodaysHours(settings: Awaited<ReturnType<typeof getBusinessSe
 }
 
 /** Format opening hours for display */
-export function formatHours(open?: string, close?: string): string {
+export function formatHours(open?: string | null, close?: string | null): string {
   if (!open || !close) return 'Fechado'
   return `${open}–${close}`
 }
@@ -186,13 +186,13 @@ export function getWeekHours(settings: Awaited<ReturnType<typeof getBusinessSett
   if (!settings) return []
 
   const days = [
-    { key: 'sunday', label: 'Domingo', open: settings.sundayOpen, close: settings.sundayClose },
-    { key: 'monday', label: 'Segunda', open: settings.mondayOpen, close: settings.mondayClose },
-    { key: 'tuesday', label: 'Terça', open: settings.tuesdayOpen, close: settings.tuesdayClose },
-    { key: 'wednesday', label: 'Quarta', open: settings.wednesdayOpen, close: settings.wednesdayClose },
-    { key: 'thursday', label: 'Quinta', open: settings.thursdayOpen, close: settings.thursdayClose },
-    { key: 'friday', label: 'Sexta', open: settings.fridayOpen, close: settings.fridayClose },
-    { key: 'saturday', label: 'Sábado', open: settings.saturdayOpen, close: settings.saturdayClose },
+    { key: 'sunday', label: 'Domingo', open: settings.sundayOpen ?? undefined, close: settings.sundayClose ?? undefined },
+    { key: 'monday', label: 'Segunda', open: settings.mondayOpen ?? undefined, close: settings.mondayClose ?? undefined },
+    { key: 'tuesday', label: 'Terça', open: settings.tuesdayOpen ?? undefined, close: settings.tuesdayClose ?? undefined },
+    { key: 'wednesday', label: 'Quarta', open: settings.wednesdayOpen ?? undefined, close: settings.wednesdayClose ?? undefined },
+    { key: 'thursday', label: 'Quinta', open: settings.thursdayOpen ?? undefined, close: settings.thursdayClose ?? undefined },
+    { key: 'friday', label: 'Sexta', open: settings.fridayOpen ?? undefined, close: settings.fridayClose ?? undefined },
+    { key: 'saturday', label: 'Sábado', open: settings.saturdayOpen ?? undefined, close: settings.saturdayClose ?? undefined },
   ]
 
   return days.map((d) => ({
@@ -205,6 +205,22 @@ export function getWeekHours(settings: Awaited<ReturnType<typeof getBusinessSett
 export function getDirectionsUrl(address: string): string {
   const encoded = encodeURIComponent(address)
   return `https://www.google.com/maps/dir/?api=1&destination=${encoded}`
+}
+
+/** Get published media assets for gallery */
+export async function getMediaAssets() {
+  return prisma.mediaAsset.findMany({
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      fileName: true,
+      mimeType: true,
+      fileSize: true,
+      altText: true,
+      storagePath: true,
+      createdAt: true,
+    },
+  })
 }
 
 /** Schema.org structured data for restaurant */

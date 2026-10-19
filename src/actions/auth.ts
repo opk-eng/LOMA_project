@@ -11,10 +11,13 @@ import {
 import { loginSchema } from '@/lib/validations'
 import { redirect } from 'next/navigation'
 
-// Simple in-memory rate limiter for login attempts
+// Simple in-memory rate limiter for login attempts.
+// Limits are configurable per environment via env vars so that automated
+// E2E tests (which perform many logins against one process) can relax them
+// without weakening the production defaults.
 const loginAttempts = new Map<string, { count: number; resetAt: number }>()
-const MAX_ATTEMPTS = 5
-const WINDOW_MS = 15 * 60 * 1000 // 15 minutes
+const MAX_ATTEMPTS = Number(process.env.LOGIN_RATE_LIMIT_MAX_ATTEMPTS ?? 5)
+const WINDOW_MS = Number(process.env.LOGIN_RATE_LIMIT_WINDOW_MS ?? 15 * 60 * 1000) // 15 minutes
 
 function checkRateLimit(key: string): boolean {
   const now = Date.now()

@@ -1,0 +1,66 @@
+﻿node.exe : [WebServer] (node:13912) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([WebServer] (no... env being set.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] ⚠ "next start" does not work with "output: standalone" configuration. Use "node .next/standalone/server.js" instead.
+Setting up isolated E2E database…
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": SQLite database "test.db" at "file:./test.db"
+
+The database is already in sync with the Prisma schema.
+
+Schema pushed to test.db.
+🌱 Seeding database...
+  ✅ Business settings
+  ✅ Default admin user (admin@loma.local)
+  ✅ Sample categories
+  ✅ Sample menu items (development only)
+🌱 Seeding complete!
+Database seeded (idempotent).
+
+Running 1 test using 1 worker
+
+(node:22512) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests\e2e\smoke.spec.ts:36:7 › Site Público - Smoke Tests › Visit page loads with address and phone (23.2s)
+Testing stopped early after 1 maximum allowed failures.
+
+
+  1) [chromium] › tests\e2e\smoke.spec.ts:36:7 › Site Público - Smoke Tests › Visit page loads with address and phone 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('address').getByText('CLN 303')
+    Expected: visible
+    Error: strict mode violation: locator('address').getByText('CLN 303') resolved to 2 elements:
+        1) <p class="text-charcoal-600">CLN 303, Bloco B, Loja 6, Asa Norte, Brasília - D…</p> aka locator('#main-content').getByText('CLN 303, Bloco B, Loja 6, Asa')
+        2) <span>CLN 303, Bloco B, Loja 6, Asa Norte, Brasília - D…</span> aka getByRole('contentinfo').getByText('CLN 303, Bloco B, Loja 6, Asa')
+
+    Call log:
+      - Expect "toBeVisible" locator('address').getByText('CLN 303') with timeout 10000ms
+      - waiting for locator('address').getByText('CLN 303')
+
+
+      39 |     await expect(page.locator('main h1')).toContainText('Venha nos visitar')
+      40 |     // The address appears in multiple places; target the <address> block.
+    > 41 |     await expect(page.locator('address').getByText('CLN 303')).toBeVisible()
+         |                                                                ^
+      42 |     await expect(page.locator('a[href^="tel:"]').first()).toBeVisible()
+      43 |   })
+      44 |
+        at C:\Users\mk1_m\Downloads\VScode\Empty\LOMA_project\tests\e2e\smoke.spec.ts:41:64
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\smoke-Site-Público---Smoke-5c19e-oads-with-address-and-phone-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\smoke-Site-Público---Smoke-5c19e-oads-with-address-and-phone-chromium\error-context.md
+
+  1 failed
+    [chromium] › tests\e2e\smoke.spec.ts:36:7 › Site Público - Smoke Tests › Visit page loads with address and phone 
+  1 error was not a part of any test, see above for details

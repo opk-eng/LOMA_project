@@ -1,8 +1,7 @@
 import { Metadata } from 'next'
 import prisma from '@/lib/db'
 import Link from 'next/link'
-import { Plus, Menu, Image, Settings, Eye, ChevronRight, Package, CheckCircle, XCircle } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Plus, Menu, ImageIcon, Settings, ChevronRight, Package } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Visão Geral',
@@ -121,7 +120,7 @@ export default async function AdminDashboardPage() {
           title="Imagens na Galeria"
           value={mediaCount}
           description={mediaCount === 0 ? 'Adicione fotos do estabelecimento' : ''}
-          icon={<Image className="h-6 w-6" aria-hidden="true" />}
+          icon={<ImageIcon className="h-6 w-6" aria-hidden="true" />}
           href="/admin/media"
           variant={mediaCount === 0 ? 'warning' : 'default'}
         />
@@ -235,7 +234,7 @@ export default async function AdminDashboardPage() {
               <span>Novo Item do Cardápio</span>
             </Link>
             <Link href="/admin/media" className="btn btn-outline h-auto py-4 flex flex-col items-center gap-2">
-              <Image className="h-6 w-6" aria-hidden="true" />
+              <ImageIcon className="h-6 w-6" aria-hidden="true" />
               <span>Gerenciar Imagens</span>
             </Link>
             <Link href="/admin/settings" className="btn btn-outline h-auto py-4 flex flex-col items-center gap-2">

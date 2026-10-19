@@ -4,7 +4,6 @@ import prisma from '@/lib/db'
 import { requireAuth } from '@/lib/auth'
 import { categorySchema } from '@/lib/validations'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 
 export type CategoryActionResult =
   | { success: true; category: { id: string; slug: string } }

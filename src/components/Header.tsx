@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X, ShoppingBag, MapPin, Phone, Instagram } from 'lucide-react'
+import { Menu, X, Phone, Camera } from 'lucide-react'
 
 const navigation = [
   { name: 'Início', href: '/' },
@@ -124,7 +124,7 @@ export default function Header({ phone, instagramUrl }: HeaderProps) {
                 className="flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
                 aria-label="Instagram do LOMA"
               >
-                <Instagram className="h-5 w-5" aria-hidden="true" />
+                <Camera className="h-5 w-5" aria-hidden="true" />
                 <span>@lomacozinha</span>
               </a>
             </div>

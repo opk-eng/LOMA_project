@@ -7,8 +7,9 @@ import { getBusinessSettings } from '@/lib/public-data'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
-import { Save, Loader2, Image, Upload, CheckCircle, AlertCircle, X } from 'lucide-react'
+import { Save, Loader2, Upload, CheckCircle, AlertCircle, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 const days = [
   { key: 'monday', label: 'Segunda-feira' },
@@ -72,47 +73,48 @@ export default function AdminSettingsPage() {
   const [ogUploading, setOgUploading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  const fetchSettings = async () => {
-    try {
-      const data = await getBusinessSettings()
-      if (data) {
+  // Mount-time fetch: setState only inside promise callbacks so we never
+  // update state synchronously in the effect body (avoids cascading renders).
+  useEffect(() => {
+    let ignore = false
+    getBusinessSettings()
+      .then((data) => {
+        if (ignore || !data) return
         setSettings({
           businessName: data.businessName,
           brandDescription: data.brandDescription,
           address: data.address,
           phone: data.phone,
           instagramUrl: data.instagramUrl,
-          mondayOpen: data.mondayOpen || '07:30',
-          mondayClose: data.mondayClose || '22:00',
-          tuesdayOpen: data.tuesdayOpen || '07:30',
-          tuesdayClose: data.tuesdayClose || '22:00',
-          wednesdayOpen: data.wednesdayOpen || '07:30',
-          wednesdayClose: data.wednesdayClose || '22:00',
-          thursdayOpen: data.thursdayOpen || '07:30',
-          thursdayClose: data.thursdayClose || '22:00',
-          fridayOpen: data.fridayOpen || '07:30',
-          fridayClose: data.fridayClose || '22:00',
-          saturdayOpen: data.saturdayOpen || '07:30',
-          saturdayClose: data.saturdayClose || '22:00',
-          sundayOpen: data.sundayOpen || '07:30',
-          sundayClose: data.sundayClose || '22:00',
+          mondayOpen: data.mondayOpen ?? '07:30',
+          mondayClose: data.mondayClose ?? '22:00',
+          tuesdayOpen: data.tuesdayOpen ?? '07:30',
+          tuesdayClose: data.tuesdayClose ?? '22:00',
+          wednesdayOpen: data.wednesdayOpen ?? '07:30',
+          wednesdayClose: data.wednesdayClose ?? '22:00',
+          thursdayOpen: data.thursdayOpen ?? '07:30',
+          thursdayClose: data.thursdayClose ?? '22:00',
+          fridayOpen: data.fridayOpen ?? '07:30',
+          fridayClose: data.fridayClose ?? '22:00',
+          saturdayOpen: data.saturdayOpen ?? '07:30',
+          saturdayClose: data.saturdayClose ?? '22:00',
+          sundayOpen: data.sundayOpen ?? '07:30',
+          sundayClose: data.sundayClose ?? '22:00',
           hasOutdoorSeating: data.hasOutdoorSeating,
           hasVeganOptions: data.hasVeganOptions,
           hasChildMenu: data.hasChildMenu,
-          seoTitle: data.seoTitle || '',
-          seoDescription: data.seoDescription || '',
-          ogImagePath: data.ogImagePath || '',
+          seoTitle: data.seoTitle ?? '',
+          seoDescription: data.seoDescription ?? '',
+          ogImagePath: data.ogImagePath ?? '',
         })
-      }
-    } catch (error) {
-      console.error('Failed to fetch settings:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchSettings()
+      })
+      .catch((error) => {
+        if (!ignore) console.error('Failed to fetch settings:', error)
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false)
+      })
+    return () => { ignore = true }
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -295,7 +297,9 @@ export default function AdminSettingsPage() {
               <div className="space-y-2">
                 {settings.ogImagePath && (
                   <div className="flex items-center gap-4 p-4 bg-cream-50 rounded-lg">
-                    <img src={settings.ogImagePath} alt="OG Image preview" className="w-24 h-16 object-cover rounded" />
+                    <div className="relative w-24 h-16 rounded overflow-hidden flex-shrink-0">
+                      <Image src={settings.ogImagePath} alt="OG Image preview" fill sizes="96x64" className="object-cover" />
+                    </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-charcoal-900">Imagem atual</p>
                       <p className="text-xs text-charcoal-500">{settings.ogImagePath}</p>

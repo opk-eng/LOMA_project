@@ -3,7 +3,7 @@ import { getBusinessSettings } from '@/lib/public-data'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
-import { Wheat, Leaf, Coffee, Heart, MapPin, Phone, Instagram, Clock, ArrowRight } from 'lucide-react'
+import { Wheat, Leaf, Coffee, Heart, MapPin, Phone, Baby } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Sobre Nós',
@@ -90,7 +90,7 @@ export default async function AboutPage() {
                 Nossa Filosofia
               </span>
               <h2 id="philosophy-title" className="font-heading text-3xl md:text-4xl font-medium tracking-tight mb-6">
-                "Somos aficionados por servir o simples de forma extraordinária."
+                &ldquo;Somos aficionados por servir o simples de forma extraordinária.&rdquo;
               </h2>
               <p className="text-lg text-charcoal-600 text-pretty">
                 {brandDescription}

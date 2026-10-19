@@ -3,6 +3,7 @@ import { getBusinessSettings, getPublishedCategoriesWithItems, getPublishedCateg
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ChevronRight, Leaf, Baby } from 'lucide-react'
 
 export const metadata: Metadata = {

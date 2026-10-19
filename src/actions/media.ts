@@ -33,7 +33,7 @@ export async function uploadImageAction(
   _prevState: UploadResult,
   formData: FormData
 ): Promise<UploadResult> {
-  const session = await requireAuth()
+  await requireAuth()
 
   const file = formData.get('image') as File
   if (!file || file.size === 0) {
@@ -71,7 +71,8 @@ export async function uploadImageAction(
     const mediaAsset = await prisma.mediaAsset.create({
       data: {
         storagePath: filePath,
-        fileName: file.name,
+        fileName, // safe file name — used to build the public URL
+        originalName: file.name, // display name
         mimeType: file.type,
         fileSize: file.size,
         altText: formData.get('altText') as string || undefined,
@@ -136,6 +137,7 @@ export async function getMediaAssets() {
     select: {
       id: true,
       fileName: true,
+      originalName: true,
       mimeType: true,
       fileSize: true,
       altText: true,

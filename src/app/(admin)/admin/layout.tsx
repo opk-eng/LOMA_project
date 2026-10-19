@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { getAdminSession } from '@/lib/admin-auth'
-import prisma from '@/lib/db'
 
 export const metadata: Metadata = {
   title: 'Painel Administrativo',
@@ -25,11 +25,6 @@ export default async function AdminLayout({
   if (!session) {
     redirect('/admin/login')
   }
-
-  const settings = await prisma.businessSettings.findUnique({ where: { id: 'main' } })
-  const categoriesCount = await prisma.category.count()
-  const itemsCount = await prisma.menuItem.count()
-  const publishedItemsCount = await prisma.menuItem.count({ where: { published: true } })
 
   return (
     <html lang="pt-BR">
@@ -86,7 +81,7 @@ export default async function AdminLayout({
             <header className="bg-background border-b border-border sticky top-0 z-20">
               <div className="container px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <h1 className="font-heading text-xl font-medium">Painel Administrativo</h1>
+                  <h2 className="font-heading text-xl font-medium">Painel Administrativo</h2>
                 </div>
                 <div className="flex items-center gap-4">
                   <a

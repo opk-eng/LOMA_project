@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { MapPin, Phone, Instagram, Clock, ArrowRight } from 'lucide-react'
+import { MapPin, Phone, Camera, ArrowRight } from 'lucide-react'
 
 interface FooterProps {
   businessName: string
@@ -40,7 +40,7 @@ export default function Footer({
                 className="text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-full p-1"
                 aria-label="Instagram do LOMA"
               >
-                <Instagram className="h-5 w-5" aria-hidden="true" />
+                <Camera className="h-5 w-5" aria-hidden="true" />
               </a>
             </div>
           </div>

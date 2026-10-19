@@ -2,7 +2,7 @@
 
 import prisma from '@/lib/db'
 import { requireAuth } from '@/lib/auth'
-import { menuItemSchema, formatPrice } from '@/lib/validations'
+import { menuItemSchema } from '@/lib/validations'
 import { revalidatePath } from 'next/cache'
 
 export type MenuItemActionResult =

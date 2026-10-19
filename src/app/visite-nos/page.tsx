@@ -3,7 +3,7 @@ import { getBusinessSettings, getDirectionsUrl, getTodaysHours } from '@/lib/pub
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
-import { MapPin, Phone, Instagram, Clock, CheckCircle, ChevronRight, ArrowRight, ExternalLink } from 'lucide-react'
+import { MapPin, Phone, Camera, CheckCircle, ArrowRight, ExternalLink } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Visite-nos',
@@ -95,7 +95,7 @@ export default async function VisitPage() {
 
                   <div>
                     <h3 className="font-heading text-lg font-medium mb-2 flex items-center gap-2">
-                      <Instagram className="h-5 w-5 text-primary" aria-hidden="true" />
+                      <Camera className="h-5 w-5 text-primary" aria-hidden="true" />
                       Instagram
                     </h3>
                     <a

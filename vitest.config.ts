@@ -1,16 +1,23 @@
 import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
 import path from 'path'
 
 export default defineConfig({
-  plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
   test: {
-    environment: 'jsdom',
+    // Use the real Node runtime (not jsdom) so that:
+    //  - globalThis.crypto / TextEncoder stay in the Node realm, which
+    //    jose's HS256 signer expects (jsdom's realm causes an
+    //    "invalid key type" instanceof failure).
+    //  - Prisma's SQLite connection works directly against the filesystem.
+    environment: 'node',
+    // Integration tests share a single SQLite file; run files one at a time
+    // so one file's cleanupAll() never wipes rows out from under another.
+    pool: 'forks',
+    fileParallelism: false,
     setupFiles: ['./tests/setup/test-setup.ts'],
     include: ['tests/unit/**/*.test.ts', 'tests/integration/**/*.test.ts'],
     coverage: {

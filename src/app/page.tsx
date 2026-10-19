@@ -3,8 +3,7 @@ import { getBusinessSettings, getPublishedCategoriesWithItems } from '@/lib/publ
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight, MapPin, Leaf, Coffee, Wheat } from 'lucide-react'
+import { ArrowRight, MapPin, Leaf, Coffee, Wheat, Phone } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'LOMA — Cozinha e Padaria Artesanal',
@@ -34,11 +33,6 @@ export default async function HomePage() {
         { label: 'Domingo', formatted: `${settings.sundayOpen}–${settings.sundayClose}` },
       ].filter((d) => d.formatted !== '–')
     : []
-
-  // Featured items: first 3 published items across categories
-  const featuredItems = categories
-    .flatMap((cat) => cat.menuItems.map((item) => ({ ...item, category: cat.name })))
-    .slice(0, 6)
 
   // Categories for preview
   const categoryPreviews = categories.filter((c) => c.menuItems.length > 0).slice(0, 4)
@@ -185,7 +179,7 @@ export default async function HomePage() {
                   description:
                     'Cardápio inclusivo com pratos veganos e menu especial para crianças.',
                 },
-              ].map((item, index) => (
+              ].map((item) => (
                 <article
                   key={item.title}
                   className="card p-8 text-center group hover:shadow-lg transition-shadow"

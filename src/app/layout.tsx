@@ -1,6 +1,11 @@
 import type { Metadata, Viewport } from 'next'
 import { getBusinessSettings } from '@/lib/public-data'
 
+// This site is data-driven (Prisma). Every page reads live business settings,
+// categories and menu items. Admin edits must reflect on the public site
+// without a rebuild, so routes are rendered dynamically on each request.
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: {
     default: 'LOMA — Cozinha e Padaria Artesanal | Asa Norte, Brasília',

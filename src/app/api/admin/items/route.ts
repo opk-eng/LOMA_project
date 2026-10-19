@@ -13,7 +13,7 @@ export async function GET() {
     })
 
     return Response.json(items)
-  } catch (error) {
+  } catch {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 }

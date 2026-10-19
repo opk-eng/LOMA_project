@@ -96,12 +96,31 @@ export function formatPrice(cents: number): string {
   })
 }
 
-/** Parses a "R$12,50" or "12.50" string to cents */
+/**
+ * Parses a price string to cents. Accepts "12,50", "R$ 12,50", "12.50",
+ * "1.234,56" (thousands separator). The last decimal separator (comma or
+ * dot) is treated as the cents separator; digits before it are reais.
+ */
 export function parsePriceToCents(value: string): number {
-  const cleaned = value.replace(/[R$\s.]/g, '').replace(',', '.')
-  const float = parseFloat(cleaned)
-  if (isNaN(float)) return 0
-  return Math.round(float * 100)
+  const cleaned = value.replace(/[^0-9,.]/g, '')
+  if (!cleaned) return 0
+
+  const lastComma = cleaned.lastIndexOf(',')
+  const lastDot = cleaned.lastIndexOf('.')
+  const sep = lastComma > lastDot ? lastComma : lastDot
+
+  if (sep === -1) {
+    // No decimal separator: interpret as whole reais.
+    const reais = parseInt(cleaned, 10)
+    return isNaN(reais) ? 0 : reais * 100
+  }
+
+  const intPart = cleaned.slice(0, sep).replace(/[.,]/g, '')
+  const fracPart = cleaned.slice(sep + 1).replace(/[.,]/g, '').slice(0, 2)
+  const reais = intPart ? parseInt(intPart, 10) : 0
+  const cents = fracPart ? parseInt(fracPart.padEnd(2, '0'), 10) : 0
+  if (isNaN(reais) || isNaN(cents)) return 0
+  return reais * 100 + cents
 }
 
 /** Generates a URL-safe slug from a string */

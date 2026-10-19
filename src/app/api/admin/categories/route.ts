@@ -21,7 +21,7 @@ export async function GET() {
     })
 
     return Response.json(categories)
-  } catch (error) {
+  } catch {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 }

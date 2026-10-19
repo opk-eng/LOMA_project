@@ -4,9 +4,9 @@ const nextConfig: NextConfig = {
   // Output standalone for Docker deployment
   output: 'standalone',
 
-  // Cache components and partial prefetching (Next.js 16 features)
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Route segments that read live database data opt out of static caching
+  // (see `export const dynamic = 'force-dynamic'` in the root layout). This
+  // keeps admin edits reflected on the public site without a rebuild.
 
   // Turbopack configuration for Tailwind CSS v4
   turbopack: {
@@ -80,12 +80,6 @@ const nextConfig: NextConfig = {
     // Allow local uploads
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-  },
-
-  // Experimental features (Next.js 16)
-  experimental: {
-    // Enable React 19 features
-    reactCompiler: false, // Set to true when stable
   },
 }
 
