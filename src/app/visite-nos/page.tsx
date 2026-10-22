@@ -3,7 +3,8 @@ import { getBusinessSettings, getDirectionsUrl, getTodaysHours } from '@/lib/pub
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
-import { MapPin, Phone, Camera, CheckCircle, ArrowRight, ExternalLink } from 'lucide-react'
+import { MapPin, Phone, Camera, CheckCircle, ArrowRight, ExternalLink, ChevronRight } from 'lucide-react'
+import { AnimatedSection } from '@/components/AnimatedSection'
 
 export const metadata: Metadata = {
   title: 'Visite-nos',
@@ -51,7 +52,7 @@ export default async function VisitPage() {
                 <li>
                   <Link href="/" className="hover:text-foreground transition-colors">Início</Link>
                 </li>
-                <li aria-hidden="true"><svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></li>
+                <li aria-hidden="true"><ChevronRight className="h-4 w-4" /></li>
                 <li aria-current="page" className="text-foreground font-medium">Visite-nos</li>
               </ol>
             </nav>
@@ -64,7 +65,10 @@ export default async function VisitPage() {
         </section>
 
         {/* Main Info Grid */}
-        <section className="py-12 md:py-16 bg-background" aria-labelledby="visit-info-title">
+        <AnimatedSection
+          className="py-16 md:py-20 bg-background"
+          aria-labelledby="visit-info-title"
+        >
           <div className="container">
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
               {/* Address & Contact */}
@@ -134,7 +138,10 @@ export default async function VisitPage() {
 
                 {/* Today status */}
                 {todaysHours && (
-                  <div className="card p-6 mb-8" style={{ borderColor: todaysHours.isOpen ? 'var(--color-sage-300)' : 'var(--color-terracotta-300)' }}>
+                  <div
+                    className="card p-6 mb-8"
+                    style={{ borderColor: todaysHours.isOpen ? 'var(--color-sage-300)' : 'var(--color-terracotta-300)' }}
+                  >
                     <div className="flex items-center gap-3 mb-3">
                       <div
                         className={`w-3 h-3 rounded-full ${
@@ -158,7 +165,7 @@ export default async function VisitPage() {
                 )}
 
                 {/* Weekly hours */}
-                <dl className="space-y-3" role="list">
+                <dl className="space-y-2" role="list">
                   {weekHours.map((day) => (
                     <div
                       key={day.label}
@@ -166,7 +173,7 @@ export default async function VisitPage() {
                       role="listitem"
                     >
                       <dt className="font-medium text-charcoal-900">{day.label}</dt>
-                      <dd className="font-medium text-primary whitespace-nowrap">{day.formatted}</dd>
+                      <dd className="font-mono text-sm font-medium text-primary whitespace-nowrap">{day.formatted}</dd>
                     </div>
                   ))}
                 </dl>
@@ -193,10 +200,13 @@ export default async function VisitPage() {
               </div>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
-        {/* Map placeholder / CTA */}
-        <section className="py-16 md:py-24 bg-cream-50" aria-labelledby="map-title">
+        {/* Map CTA */}
+        <AnimatedSection
+          className="py-20 md:py-28 bg-cream-50"
+          aria-labelledby="map-title"
+        >
           <div className="container">
             <div className="text-center max-w-2xl mx-auto">
               <h2 id="map-title" className="font-heading text-3xl md:text-4xl font-medium tracking-tight mb-6">
@@ -223,32 +233,7 @@ export default async function VisitPage() {
               </div>
             </div>
           </div>
-        </section>
-
-        {/* Map embed placeholder */}
-        <section className="py-16 bg-charcoal-900" aria-labelledby="map-embed-title">
-          <div className="container">
-            <div className="aspect-video bg-charcoal-800 rounded-xl flex items-center justify-center relative overflow-hidden">
-              <div className="text-center text-cream-50 p-8">
-                <MapPin className="h-16 w-16 mx-auto text-terracotta-400 mb-4" aria-hidden="true" />
-                <h3 className="font-heading text-2xl font-medium mb-2">Mapa interativo</h3>
-                <p className="text-cream-400 mb-6 max-w-md mx-auto">
-                  Para uma experiência mais leve e respeitando sua privacidade, usamos um link direto
-                  para o Google Maps em vez de incorporar o mapa pesado.
-                </p>
-                <a
-                  href={directionsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline btn-lg border-cream-300 text-cream-50 hover:bg-cream-100 hover:text-charcoal-900 inline-flex items-center gap-2"
-                >
-                  <ExternalLink className="h-5 w-5" aria-hidden="true" />
-                  Abrir no Google Maps
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+        </AnimatedSection>
       </main>
       <Footer
         businessName={businessName}

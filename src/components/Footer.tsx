@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { MapPin, Phone, Camera, ArrowRight } from 'lucide-react'
+import Logo from '@/components/Logo'
 
 interface FooterProps {
   businessName: string
@@ -21,41 +22,41 @@ export default function Footer({
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-muted/50 border-t border-border" role="contentinfo">
-      <div className="container py-16 lg:py-24">
+    <footer className="bg-charcoal-900 text-cream-100" role="contentinfo">
+      <div className="container py-12 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link href="/" className="block mb-6" aria-label={`${businessName} — Página inicial`}>
-              <span className="font-heading text-3xl font-medium tracking-tight">LOMA</span>
-            </Link>
-            <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
-              {brandDescription}
+            <Logo className="mb-6" showTagline />
+            <p className="text-cream-400 text-sm leading-relaxed max-w-xs">
+              {brandDescription || 'Cozinha e padaria artesanal em Asa Norte, Brasília.'}
             </p>
-            <div className="flex gap-4 mt-6">
+            <div className="flex gap-3 mt-6">
               <a
                 href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-full p-1"
+                className="p-2.5 rounded-full bg-cream-100/10 text-cream-300 hover:text-cream-50 hover:bg-cream-100/20 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-400"
                 aria-label="Instagram do LOMA"
               >
-                <Camera className="h-5 w-5" aria-hidden="true" />
+                <Camera className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="font-heading text-lg font-medium mb-4">Contato</h3>
-            <address className="not-italic text-sm text-muted-foreground space-y-3">
+            <h3 className="font-heading text-base font-medium text-cream-50 mb-4 uppercase tracking-wider text-xs">
+              Contato
+            </h3>
+            <address className="not-italic text-sm text-cream-400 space-y-3">
               <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" aria-hidden="true" />
+                <MapPin className="h-5 w-5 text-terracotta-400 mt-0.5 flex-shrink-0" aria-hidden="true" />
                 <span>{address}</span>
               </div>
               <a
                 href={`tel:${phone.replace(/\s/g, '')}`}
-                className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm"
+                className="flex items-center gap-3 text-cream-400 hover:text-cream-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-400 rounded-sm px-1 -mx-1"
               >
                 <Phone className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
                 <span>{phone}</span>
@@ -65,12 +66,14 @@ export default function Footer({
 
           {/* Hours */}
           <div>
-            <h3 className="font-heading text-lg font-medium mb-4">Horário de Funcionamento</h3>
-            <dl className="text-sm text-muted-foreground space-y-2">
+            <h3 className="font-heading text-base font-medium text-cream-50 mb-4 uppercase tracking-wider text-xs">
+              Horário de Funcionamento
+            </h3>
+            <dl className="text-sm text-cream-400 space-y-1.5">
               {weekHours.map((day) => (
                 <div key={day.label} className="flex justify-between gap-4">
-                  <dt className="font-medium text-foreground">{day.label}</dt>
-                  <dd className="text-right whitespace-nowrap">{day.formatted}</dd>
+                  <dt className="font-medium text-cream-300">{day.label}</dt>
+                  <dd className="text-right whitespace-nowrap font-mono text-xs">{day.formatted}</dd>
                 </div>
               ))}
             </dl>
@@ -78,68 +81,42 @@ export default function Footer({
 
           {/* Navigation */}
           <div>
-            <h3 className="font-heading text-lg font-medium mb-4">Navegação</h3>
+            <h3 className="font-heading text-base font-medium text-cream-50 mb-4 uppercase tracking-wider text-xs">
+              Navegação
+            </h3>
             <nav aria-label="Navegação do rodapé">
-              <ul className="space-y-3">
-                <li>
-                  <Link
-                    href="/"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm inline-flex items-center gap-1"
-                  >
-                    Início
-                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/cardapio"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm inline-flex items-center gap-1"
-                  >
-                    Cardápio
-                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/sobre"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm inline-flex items-center gap-1"
-                  >
-                    Sobre Nós
-                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/galeria"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm inline-flex items-center gap-1"
-                  >
-                    Galeria
-                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/visite-nos"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm inline-flex items-center gap-1"
-                  >
-                    Visite-nos
-                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Link>
-                </li>
+              <ul className="space-y-2">
+                {[
+                  { name: 'Início', href: '/' },
+                  { name: 'Cardápio', href: '/cardapio' },
+                  { name: 'Sobre Nós', href: '/sobre' },
+                  { name: 'Galeria', href: '/galeria' },
+                  { name: 'Visite-nos', href: '/visite-nos' },
+                ].map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className="text-sm text-cream-400 hover:text-cream-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-400 rounded-sm px-1 -mx-1 inline-flex items-center gap-1.5 py-1"
+                    >
+                      {item.name}
+                      <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </nav>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-8 border-t border-border">
+        <div className="mt-12 pt-8 border-t border-cream-100/10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-cream-500">
               © {currentYear} {businessName}. Todos os direitos reservados.
             </p>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>Feito com cuidado em Brasília</span>
-            </div>
+            <p className="text-sm text-cream-500">
+              Feito com cuidado em Brasília
+            </p>
           </div>
         </div>
       </div>

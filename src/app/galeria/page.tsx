@@ -3,8 +3,8 @@ import { getBusinessSettings, getMediaAssets } from '@/lib/public-data'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
-import Image from 'next/image'
-import { ChevronRight, Expand, Camera } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+import GalleryClient from '@/components/GalleryClient'
 
 export const metadata: Metadata = {
   title: 'Galeria',
@@ -44,7 +44,7 @@ export default async function GalleryPage() {
                 <li>
                   <Link href="/" className="hover:text-foreground transition-colors">Início</Link>
                 </li>
-                <li aria-hidden="true"><svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></li>
+                <li aria-hidden="true"><ChevronRight className="h-4 w-4" /></li>
                 <li aria-current="page" className="text-foreground font-medium">Galeria</li>
               </ol>
             </nav>
@@ -56,90 +56,7 @@ export default async function GalleryPage() {
           </div>
         </section>
 
-        {/* Gallery Grid */}
-        <section className="py-12 md:py-16" aria-labelledby="gallery-content-title">
-          <div className="container">
-            <h2 id="gallery-content-title" className="sr-only">Imagens da galeria</h2>
-
-            {mediaAssets.length === 0 ? (
-              <div className="text-center py-20">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted mb-6">
-                  <svg className="h-10 w-10 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h3 className="font-heading text-2xl font-medium mb-2">Galeria vazia</h3>
-                <p className="text-charcoal-600 mb-6">
-                  Ainda não há imagens publicadas. Administradores podem fazer upload no painel.
-                </p>
-                <div className="bg-terracotta-50 border border-terracotta-200 rounded-lg p-6 max-w-md mx-auto text-left">
-                  <p className="text-sm text-terracotta-800 mb-2">
-                    <strong>Nota sobre direitos de imagem:</strong> Priorizamos fotografias oficiais da LOMA
-                    do Instagram (com autorização) ou fornecidas diretamente pelo estabelecimento.
-                  </p>
-                  <p className="text-sm text-terracotta-700">
-                    Não usamos imagens de outros estabelecimentos nem placeholders como se fossem oficiais.
-                    As imagens aqui devem ser autorizadas pelo proprietário.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div
-                  className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                  role="list"
-                  aria-label="Imagens da galeria"
-                >
-                  {mediaAssets.map((asset) => (
-                    <article
-                      key={asset.id}
-                      className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted group cursor-zoom-in"
-                      role="listitem"
-                    >
-                      <Image
-                        src={`/uploads/${asset.fileName}`}
-                        alt={asset.altText || `Imagem da galeria LOMA`}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                        <div className="w-full flex justify-between items-end text-white">
-                          <span className="text-sm font-medium truncate max-w-[80%]">
-                            {asset.altText || 'Imagem LOMA'}
-                          </span>
-                          <button
-                            className="p-2 bg-white/20 backdrop-blur rounded-full text-white hover:bg-white/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                            aria-label={`Ampliar ${asset.altText || 'imagem'}`}
-                          >
-                            <Expand className="h-5 w-5" aria-hidden="true" />
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-
-                {/* Camera link */}
-                <div className="text-center mt-12 pt-8 border-t border-border">
-                  <p className="text-charcoal-600 mb-4">
-                    Acompanhe mais no nosso Instagram:
-                  </p>
-                  <a
-                    href={instagramUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-outline inline-flex items-center gap-2"
-                  >
-                    <Camera className="h-5 w-5" aria-hidden="true" />
-                    @lomacozinha
-                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
-                  </a>
-                </div>
-              </>
-            )}
-          </div>
-        </section>
+        <GalleryClient initialAssets={mediaAssets} />
       </main>
       <Footer
         businessName={businessName}

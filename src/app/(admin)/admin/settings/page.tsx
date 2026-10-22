@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { updateSettingsAction, updateOgImageAction } from '@/actions/settings'
 import { uploadImageAction } from '@/actions/media'
 import { getBusinessSettings } from '@/lib/public-data'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
-import { Save, Loader2, Upload, CheckCircle, AlertCircle, X } from 'lucide-react'
+import { Skeleton, CardSkeleton } from '@/components/ui/Skeleton'
+import { useToast } from '@/components/ui/Toast'
+import { Save, Upload, CheckCircle, AlertCircle, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 
@@ -22,6 +24,7 @@ const days = [
 ]
 
 export default function AdminSettingsPage() {
+  const { addToast } = useToast()
   const [settings, setSettings] = useState<{
     businessName: string
     brandDescription: string
@@ -73,8 +76,7 @@ export default function AdminSettingsPage() {
   const [ogUploading, setOgUploading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  // Mount-time fetch: setState only inside promise callbacks so we never
-  // update state synchronously in the effect body (avoids cascading renders).
+  // Fetch settings on mount only
   useEffect(() => {
     let ignore = false
     getBusinessSettings()
@@ -117,15 +119,15 @@ export default function AdminSettingsPage() {
     return () => { ignore = true }
   }, [])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
     setSettings(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }))
-  }
+  }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
     setMessage(null)
@@ -144,12 +146,14 @@ export default function AdminSettingsPage() {
 
     if (result.success) {
       setMessage({ type: 'success', text: 'Configurações salvas com sucesso!' })
+      addToast({ type: 'success', message: 'Configurações salvas com sucesso!' })
     } else {
       setMessage({ type: 'error', text: result.error || 'Erro ao salvar configurações.' })
+      addToast({ type: 'error', message: result.error || 'Erro ao salvar configurações.' })
     }
-  }
+  }, [settings, addToast])
 
-  const handleOgImageUpload = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleOgImageUpload = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const fileInput = e.currentTarget.elements.namedItem('ogImage') as HTMLInputElement
     if (!fileInput.files?.[0]) return
@@ -168,13 +172,16 @@ export default function AdminSettingsPage() {
       if (ogResult.success) {
         setSettings(prev => ({ ...prev, ogImagePath: result.path }))
         setMessage({ type: 'success', text: 'Imagem de compartilhamento atualizada!' })
+        addToast({ type: 'success', message: 'Imagem de compartilhamento atualizada!' })
       } else {
         setMessage({ type: 'error', text: 'Erro ao atualizar imagem de compartilhamento.' })
+        addToast({ type: 'error', message: 'Erro ao atualizar imagem de compartilhamento.' })
       }
     } else {
       setMessage({ type: 'error', text: result.error })
+      addToast({ type: 'error', message: result.error })
     }
-  }
+  }, [addToast])
 
   const showMessage = () => {
     if (!message) return null
@@ -193,8 +200,10 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-64" />
+        <CardSkeleton lines={4} />
+        <CardSkeleton lines={3} />
       </div>
     )
   }

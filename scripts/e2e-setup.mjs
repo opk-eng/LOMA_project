@@ -15,19 +15,26 @@ import { fileURLToPath } from 'node:url'
 import { unlinkSync, existsSync } from 'node:fs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const TEST_DB = 'file:./test.db'
+const TEST_DB_PATH = resolve(ROOT, 'test.db')
+const TEST_DB = `file:${TEST_DB_PATH}`
 
 const env = { ...process.env, DATABASE_URL: TEST_DB }
 
 // Start from a clean database so test runs are deterministic (E2E tests
 // create categories/items with fixed slugs — leftovers would break re-runs).
+// Clean both possible locations: ./test.db and prisma/test.db
 if (existsSync(resolve(ROOT, 'test.db'))) {
   unlinkSync(resolve(ROOT, 'test.db'))
 }
+if (existsSync(resolve(ROOT, 'prisma', 'test.db'))) {
+  unlinkSync(resolve(ROOT, 'prisma', 'test.db'))
+}
 
 console.log('Setting up isolated E2E database…')
+// Use local prisma binary (pinned in package.json to 5.22.0) — npx pulls latest
+const prismaBin = resolve(ROOT, 'node_modules/.bin/prisma')
 try {
-  execSync('npx prisma db push --skip-generate', {
+  execSync(`"${prismaBin}" db push --skip-generate`, {
     cwd: ROOT,
     stdio: 'inherit',
     env,

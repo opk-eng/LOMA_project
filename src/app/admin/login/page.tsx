@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import Logo from '@/components/Logo'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -17,10 +18,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-10">
-          <Link href="/" className="inline-block" aria-label="LOMA — Página inicial">
-            <span className="font-heading text-4xl font-medium tracking-tight text-charcoal-900">LOMA</span>
-          </Link>
-          <p className="text-sm text-charcoal-500 mt-2">Cozinha e Padaria Artesanal</p>
+          <Logo className="justify-center" showTagline />
         </div>
 
         {/* Login Card */}

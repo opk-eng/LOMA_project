@@ -88,11 +88,11 @@ export default async function AdminDashboardPage() {
           <p className="text-charcoal-600 mt-1">Acompanhe o status do seu conteúdo</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/admin/menu?tab=categories" className="btn btn-primary">
+          <Link href="/admin/menu?tab=categories&new=true" className="btn btn-primary">
             <Plus className="h-4 w-4" aria-hidden="true" />
             Nova Categoria
           </Link>
-          <Link href="/admin/menu?tab=items" className="btn btn-secondary">
+          <Link href="/admin/menu?tab=items&new=true" className="btn btn-secondary">
             <Plus className="h-4 w-4" aria-hidden="true" />
             Novo Item
           </Link>

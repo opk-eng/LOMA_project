@@ -8,7 +8,7 @@ Copy everything below (inside the block) as the prompt for the next session.
 
 Continue work on `LOMA_project` (an artisanal bakery/restaurant site + admin dashboard per the original LOMA prompt requirements). Repo: Next.js 16.4.2 App Router (Turbopack, **breaking changes vs. known Next — read `AGENTS.md` and `node_modules/next/dist/docs/` before writing Next-specific code**), React 19, Prisma **5.22.0** (pinned — Prisma 7 was in package.json and broke the build; do NOT upgrade Prisma without migrating the config), SQLite dev DB (`dev.db`, via `DATABASE_URL` in `.env`), Tailwind v4, Zod 4, Playwright 1.64, Vitest 1.6. Windows PowerShell environment.
 
-## State already verified green (do not re-do)
+## State already verified green (do not re-do) sk-ce10d2717562055f-def96b-895afad2
 
 - `npm run typecheck` → clean
 - `npx eslint src --max-warnings=0` → clean
@@ -17,7 +17,7 @@ Continue work on `LOMA_project` (an artisanal bakery/restaurant site + admin das
 - Public routes all return 200; `/admin` → 307 → `/admin/login` (redirect loop fixed by moving protected pages into the `src/app/(admin)/admin/...` route group so `/admin/login` is outside the auth-gated layout)
 - Docs/README partially updated; `.gitignore` covers `*.db`, `public/uploads/`, Playwright outputs
 
-## Where I stopped: E2E suite — 22/34 passing, 12 failing
+## Current Status: Debugging E2E "Can create a new category" test
 
 Last run: `npm run test:e2e` (2 projects: chromium + mobile-chrome; `globalSetup` in `tests/e2e/global-setup.ts` re-creates and seeds `test.db` on every run; webServer env sets `LOGIN_RATE_LIMIT_MAX_ATTEMPTS=100` so the in-memory login rate limiter in `src/actions/auth.ts` doesn't lock out the suite — the limiter reads `process.env.LOGIN_RATE_LIMIT_MAX_ATTEMPTS` / `LOGIN_RATE_LIMIT_WINDOW_MS`, defaults 5 / 15min).
 

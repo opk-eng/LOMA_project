@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { getBusinessSettings } from '@/lib/public-data'
+import './globals.css'
 
 // This site is data-driven (Prisma). Every page reads live business settings,
 // categories and menu items. Admin edits must reflect on the public site

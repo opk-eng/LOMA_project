@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   createCategoryAction, updateCategoryAction,
   toggleCategoryPublishAction, deleteCategoryAction,
@@ -13,9 +13,11 @@ import {
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
+import { Skeleton, ListSkeleton } from '@/components/ui/Skeleton'
+import { useToast } from '@/components/ui/Toast'
 import {
-  Plus, Trash2, Edit, Eye, EyeOff, X, Loader2,
-  Package, Menu, Check,
+  Plus, Trash2, Edit, Eye, EyeOff, X,
+  Package, Menu, Check, AlertCircle,
 } from 'lucide-react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -62,14 +64,6 @@ function issueMap(result: { issues?: Record<string, string[]> }): Record<string,
   return out
 }
 
-/**
- * Serialize a React form-state object to a FormData that the server actions
- * understand. Booleans are encoded like native HTML checkboxes:
- *  - true  → append key with value "on"
- *  - false → key is omitted entirely
- * The server reads `formData.get(key) === 'on'`, so this round-trips correctly.
- * Non-boolean fields (strings, numbers) are appended as-is.
- */
 function appendFormFields(formData: FormData, form: Record<string, unknown>) {
   for (const [key, value] of Object.entries(form)) {
     if (typeof value === 'boolean') {
@@ -80,7 +74,7 @@ function appendFormFields(formData: FormData, form: Record<string, unknown>) {
   }
 }
 
-// ── Category form (key-remounted so local state re-initializes per target) ──
+// ── Category form ─────────────────────────────────────────────────────────────
 function CategoryForm({
   initial, onSave, onCancel, deleting,
 }: {
@@ -245,7 +239,7 @@ function ItemForm({
             <Input label="Imagem (caminho)" name="imagePath" value={form.imagePath} onChange={(e) => setForm({ ...form, imagePath: e.target.value })} placeholder="/uploads/foto.jpg" disabled={busy} error={fieldErrors.imagePath} />
           </div>
           <Input label="Texto alternativo da imagem" name="imageAlt" value={form.imageAlt} onChange={(e) => setForm({ ...form, imageAlt: e.target.value })} placeholder="Pão artesanal na mesa" disabled={busy} error={fieldErrors.imageAlt} />
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" name="published" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} disabled={busy} className="w-4 h-4 rounded border-border text-primary focus:ring-focus" />
               <span className="text-sm">Publicado</span>
@@ -279,29 +273,19 @@ function ItemForm({
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function AdminMenuPage() {
-  const searchParams = useSearchParams()
   const router = useRouter()
-  const tab = searchParams.get('tab') || 'categories'
-  const editId = searchParams.get('edit')
-  const newItem = searchParams.get('new')
-
+  const { addToast } = useToast()
   const [categories, setCategories] = useState<Category[]>([])
   const [items, setItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'category' | 'item'; id: string; name: string } | null>(null)
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false)
+  const [itemModalOpen, setItemModalOpen] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
 
-  // Derived modal targets from the URL (so dashboard deep-links work).
-  const showCategoryForm = tab === 'categories' && (newItem === 'true' || !!editId)
-  const activeCategory = categories.find((c) => c.id === editId) ?? null
-  const showItemForm = tab === 'items' && (newItem === 'true' || !!editId)
-  const activeItem = items.find((i) => i.id === editId) ?? null
-
-  const closeCategoryForm = () => router.push('/admin/menu?tab=categories')
-  const closeItemForm = () => router.push('/admin/menu?tab=items')
-
-  // Mount-time fetch: setState only inside promise callbacks so we never
-  // update state synchronously in the effect body (avoids cascading renders).
+  // Fetch data on mount only
   useEffect(() => {
     let ignore = false
     Promise.all([
@@ -322,24 +306,46 @@ export default function AdminMenuPage() {
     return () => { ignore = true }
   }, [])
 
-  const handleSaved = (tabName: 'categories' | 'items') => {
+  const handleSaved = useCallback((tabName: 'categories' | 'items') => {
     setSaving(null)
-    router.push(`/admin/menu?tab=${tabName}`) // clears ?edit=/?new=
-    router.refresh() // re-fetch server data so the list reflects the change
-  }
+    if (tabName === 'categories') {
+      setCategoryModalOpen(false)
+      setEditingCategory(null)
+    } else {
+      setItemModalOpen(false)
+      setEditingItem(null)
+    }
+    router.refresh()
+  }, [router])
 
-  const handleTogglePublish = async (type: 'category' | 'item', id: string, published: boolean) => {
+  const handleEditCategory = useCallback((cat: Category) => {
+    setEditingCategory(cat)
+    setCategoryModalOpen(true)
+  }, [])
+
+  const handleEditItem = useCallback((item: MenuItem) => {
+    setEditingItem(item)
+    setItemModalOpen(true)
+  }, [])
+
+  const handleTogglePublish = useCallback(async (type: 'category' | 'item', id: string, published: boolean) => {
     const action = type === 'category' ? toggleCategoryPublishAction : toggleMenuItemPublishAction
     const result = await action(id, published)
-    if (result.success) router.refresh()
-  }
+    if (result.success) {
+      router.refresh()
+      addToast({ type: 'success', message: published ? 'Item publicado com sucesso' : 'Item despublicado' })
+    }
+  }, [router, addToast])
 
-  const handleToggleAvailable = async (id: string, available: boolean) => {
+  const handleToggleAvailable = useCallback(async (id: string, available: boolean) => {
     const result = await toggleMenuItemAvailableAction(id, available)
-    if (result.success) router.refresh()
-  }
+    if (result.success) {
+      router.refresh()
+      addToast({ type: 'info', message: available ? 'Item marcado como disponível' : 'Item marcado como indisponível' })
+    }
+  }, [router, addToast])
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!deleteConfirm) return
     const action = deleteConfirm.type === 'category' ? deleteCategoryAction : deleteMenuItemAction
     setSaving(deleteConfirm.id)
@@ -347,16 +353,24 @@ export default function AdminMenuPage() {
     setSaving(null)
     if (result.success) {
       router.refresh()
+      addToast({ type: 'success', message: `${deleteConfirm.name} excluído com sucesso` })
     } else {
-      alert(result.error)
+      addToast({ type: 'error', message: result.error || 'Erro ao excluir' })
     }
     setDeleteConfirm(null)
-  }
+  }, [deleteConfirm, router, addToast])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <div className="flex items-center gap-4 py-4">
+          <Skeleton className="h-8 w-48" />
+          <div className="ml-auto flex gap-2">
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </div>
+        <ListSkeleton items={4} />
       </div>
     )
   }
@@ -371,15 +385,15 @@ export default function AdminMenuPage() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Button
-            variant={tab === 'categories' ? 'primary' : 'secondary'}
-            onClick={() => router.push('/admin/menu?tab=categories')}
+            variant={categoryModalOpen ? 'primary' : 'secondary'}
+            onClick={() => { setEditingCategory(null); setCategoryModalOpen(true) }}
           >
             <Package className="h-4 w-4" aria-hidden="true" />
             Categorias ({categories.length})
           </Button>
           <Button
-            variant={tab === 'items' ? 'primary' : 'secondary'}
-            onClick={() => router.push('/admin/menu?tab=items')}
+            variant={itemModalOpen ? 'primary' : 'secondary'}
+            onClick={() => { setEditingItem(null); setItemModalOpen(true) }}
           >
             <Menu className="h-4 w-4" aria-hidden="true" />
             Itens ({items.length})
@@ -388,25 +402,25 @@ export default function AdminMenuPage() {
       </div>
 
       {/* Category Form Modal */}
-      {showCategoryForm && (
+      {categoryModalOpen && (
         <CategoryForm
-          key={activeCategory?.id ?? 'new'}
-          initial={activeCategory}
+          key={editingCategory?.id ?? 'new-cat'}
+          initial={editingCategory}
           deleting={saving !== null}
           onSave={() => handleSaved('categories')}
-          onCancel={closeCategoryForm}
+          onCancel={() => { setCategoryModalOpen(false); setEditingCategory(null) }}
         />
       )}
 
       {/* Item Form Modal */}
-      {showItemForm && (
+      {itemModalOpen && (
         <ItemForm
-          key={activeItem?.id ?? 'new'}
-          initial={activeItem}
+          key={editingItem?.id ?? 'new-item'}
+          initial={editingItem}
           categories={categories}
           deleting={saving !== null}
           onSave={() => handleSaved('items')}
-          onCancel={closeItemForm}
+          onCancel={() => { setItemModalOpen(false); setEditingItem(null) }}
         />
       )}
 
@@ -414,7 +428,12 @@ export default function AdminMenuPage() {
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-title">
           <div className="bg-background rounded-xl shadow-xl w-full max-w-md p-6">
-            <h2 id="delete-confirm-title" className="font-heading text-lg font-medium mb-2">Confirmar exclusão</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-terracotta-100 flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="h-5 w-5 text-terracotta-600" aria-hidden="true" />
+              </div>
+              <h2 id="delete-confirm-title" className="font-heading text-lg font-medium">Confirmar exclusão</h2>
+            </div>
             <p className="text-charcoal-600 mb-6">
               Tem certeza que deseja excluir <strong>{deleteConfirm.name}</strong>?
               {deleteConfirm.type === 'category' && ' Esta ação não pode ser desfeita e só é permitida se a categoria não tiver itens associados.'}
@@ -430,121 +449,113 @@ export default function AdminMenuPage() {
       )}
 
       {/* Categories Tab */}
-      {tab === 'categories' && (
-        <section className="card" aria-labelledby="categories-list-title">
-          <div className="p-6 border-b border-border flex items-center justify-between">
-            <h2 id="categories-list-title" className="font-heading text-lg font-medium">Categorias</h2>
-            <Button onClick={() => router.push('/admin/menu?tab=categories&new=true')}>
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              Nova Categoria
-            </Button>
-          </div>
-          <div className="divide-y divide-border">
-            {categories.length === 0 ? (
-              <div className="p-12 text-center text-charcoal-500">
-                <Package className="h-12 w-12 mx-auto text-charcoal-300 mb-3" aria-hidden="true" />
-                <p className="mb-2">Nenhuma categoria criada</p>
-                <Button onClick={() => router.push('/admin/menu?tab=categories&new=true')}>
-                  Criar primeira categoria
-                </Button>
-              </div>
-            ) : (
-              categories.map((cat) => (
-                <div key={cat.id} className="p-4 hover:bg-cream-50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={() => handleTogglePublish('category', cat.id, !cat.published)}
-                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${cat.published ? 'bg-sage-100 text-sage-600' : 'bg-charcoal-100 text-charcoal-400'}`}
-                      aria-label={cat.published ? 'Despublicar' : 'Publicar'}
-                    >
-                      {cat.published ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-charcoal-900 truncate">{cat.name}</p>
-                      <p className="text-xs text-charcoal-500">
-                        Slug: {cat.slug} • {cat._count?.menuItems || 0} itens • {cat.published ? 'Publicada' : 'Rascunho'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/menu?tab=categories&edit=${cat.id}`)} aria-label="Editar">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm({ type: 'category', id: cat.id, name: cat.name })} aria-label="Excluir">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+      <section className="card" aria-labelledby="categories-list-title">
+        <div className="p-6 border-b border-border flex items-center justify-between">
+          <h2 id="categories-list-title" className="font-heading text-lg font-medium">Categorias</h2>
+          <Button onClick={() => { setEditingCategory(null); setCategoryModalOpen(true) }}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Nova Categoria
+          </Button>
+        </div>
+        <div className="divide-y divide-border">
+          {categories.length === 0 ? (
+            <div className="p-12 text-center text-charcoal-500">
+              <Package className="h-12 w-12 mx-auto text-charcoal-300 mb-3" aria-hidden="true" />
+              <p className="mb-2">Nenhuma categoria criada</p>
+              <Button onClick={() => { setEditingCategory(null); setCategoryModalOpen(true) }}>Criar primeira categoria</Button>
+            </div>
+          ) : (
+            categories.map((cat) => (
+              <div key={cat.id} className="p-4 hover:bg-cream-50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => handleTogglePublish('category', cat.id, !cat.published)}
+                    className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${cat.published ? 'bg-sage-100 text-sage-600' : 'bg-charcoal-100 text-charcoal-400'}`}
+                    aria-label={cat.published ? 'Despublicar' : 'Publicar'}
+                  >
+                    {cat.published ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-charcoal-900 truncate">{cat.name}</p>
+                    <p className="text-xs text-charcoal-500">
+                      Slug: {cat.slug} • {cat._count?.menuItems || 0} itens • {cat.published ? 'Publicada' : 'Rascunho'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditCategory(cat)} aria-label="Editar">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm({ type: 'category', id: cat.id, name: cat.name })} aria-label="Excluir">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </section>
-      )}
+              </div>
+            ))
+          )}
+        </div>
+      </section>
 
       {/* Items Tab */}
-      {tab === 'items' && (
-        <section className="card" aria-labelledby="items-list-title">
-          <div className="p-6 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h2 id="items-list-title" className="font-heading text-lg font-medium">Itens do Cardápio</h2>
-            <Button onClick={() => router.push('/admin/menu?tab=items&new=true')}>
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              Novo Item
-            </Button>
-          </div>
-          <div className="divide-y divide-border">
-            {items.length === 0 ? (
-              <div className="p-12 text-center text-charcoal-500">
-                <Menu className="h-12 w-12 mx-auto text-charcoal-300 mb-3" aria-hidden="true" />
-                <p className="mb-2">Nenhum item criado</p>
-                <Button onClick={() => router.push('/admin/menu?tab=items&new=true')}>
-                  Criar primeiro item
-                </Button>
-              </div>
-            ) : (
-              items.map((item) => (
-                <div key={item.id} className="p-4 hover:bg-cream-50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="flex flex-col gap-1">
-                      <button
-                        onClick={() => handleTogglePublish('item', item.id, !item.published)}
-                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${item.published ? 'bg-sage-100 text-sage-600' : 'bg-charcoal-100 text-charcoal-400'}`}
-                        aria-label={item.published ? 'Despublicar' : 'Publicar'}
-                      >
-                        {item.published ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
-                      </button>
-                      <button
-                        onClick={() => handleToggleAvailable(item.id, !item.available)}
-                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${item.available ? 'bg-brand-blue-100 text-brand-blue-600' : 'bg-charcoal-100 text-charcoal-400'}`}
-                        aria-label={item.available ? 'Marcar indisponível' : 'Marcar disponível'}
-                      >
-                        {item.available ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                      </button>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-charcoal-900 truncate">{item.name}</p>
-                      <p className="text-xs text-charcoal-500">
-                        {item.category?.name} • R$ {formatPrice(item.priceInCents)}
-                        {item.isVegan && ' • 🌱 Vegano'}
-                        {item.isChildFriendly && ' • 👶 Infantil'}
-                        {' • ' + (item.published ? 'Publicado' : 'Rascunho')}
-                        {' • ' + (item.available ? 'Disponível' : 'Indisponível')}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/menu?tab=items&edit=${item.id}`)} aria-label="Editar">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm({ type: 'item', id: item.id, name: item.name })} aria-label="Excluir">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+      <section className="card" aria-labelledby="items-list-title">
+        <div className="p-6 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h2 id="items-list-title" className="font-heading text-lg font-medium">Itens do Cardápio</h2>
+          <Button onClick={() => { setEditingItem(null); setItemModalOpen(true) }}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Novo Item
+          </Button>
+        </div>
+        <div className="divide-y divide-border">
+          {items.length === 0 ? (
+            <div className="p-12 text-center text-charcoal-500">
+              <Menu className="h-12 w-12 mx-auto text-charcoal-300 mb-3" aria-hidden="true" />
+              <p className="mb-2">Nenhum item criado</p>
+              <Button onClick={() => { setEditingItem(null); setItemModalOpen(true) }}>Criar primeiro item</Button>
+            </div>
+          ) : (
+            items.map((item) => (
+              <div key={item.id} className="p-4 hover:bg-cream-50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => handleTogglePublish('item', item.id, !item.published)}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${item.published ? 'bg-sage-100 text-sage-600' : 'bg-charcoal-100 text-charcoal-400'}`}
+                      aria-label={item.published ? 'Despublicar' : 'Publicar'}
+                    >
+                      {item.published ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+                    </button>
+                    <button
+                      onClick={() => handleToggleAvailable(item.id, !item.available)}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${item.available ? 'bg-brand-blue-100 text-brand-blue-600' : 'bg-charcoal-100 text-charcoal-400'}`}
+                      aria-label={item.available ? 'Marcar indisponível' : 'Marcar disponível'}
+                    >
+                      {item.available ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-charcoal-900 truncate">{item.name}</p>
+                    <p className="text-xs text-charcoal-500">
+                      {item.category?.name} • R$ {formatPrice(item.priceInCents)}
+                      {item.isVegan && ' • Vegano'}
+                      {item.isChildFriendly && ' • Infantil'}
+                      {' • ' + (item.published ? 'Publicado' : 'Rascunho')}
+                      {' • ' + (item.available ? 'Disponível' : 'Indisponível')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditItem(item)} aria-label="Editar">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm({ type: 'item', id: item.id, name: item.name })} aria-label="Excluir">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </section>
-      )}
+              </div>
+            ))
+          )}
+        </div>
+      </section>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { resolve } from 'node:path'
 
 export default defineConfig({
   // Always re-create the isolated E2E database before tests run, so the suite
@@ -26,19 +27,11 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run start',
+    // Pass DATABASE_URL directly in the command to ensure Next.js uses the test database
+    command: `DATABASE_URL=file:${resolve(process.cwd(), 'test.db')} LOGIN_RATE_LIMIT_MAX_ATTEMPTS=100 LOGIN_RATE_LIMIT_WINDOW_MS=60000 npm run dev`,
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 180000,
-    // Isolated test database — never touch the dev database.
-    // Relax the login rate limiter so the E2E suite (which logs in many
-    // times against one process) doesn't get permanently locked out.
-    env: {
-      NODE_ENV: 'production',
-      DATABASE_URL: 'file:./test.db',
-      LOGIN_RATE_LIMIT_MAX_ATTEMPTS: '100',
-      LOGIN_RATE_LIMIT_WINDOW_MS: '60000',
-    },
   },
   timeout: 60000,
   expect: {

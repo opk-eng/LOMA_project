@@ -1,13 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { uploadImageAction, deleteImageAction, getMediaAssets } from '@/actions/media'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { Skeleton, CardSkeleton } from '@/components/ui/Skeleton'
+import { useToast } from '@/components/ui/Toast'
 import Image from 'next/image'
 import { ImageIcon, Trash2, Upload, Loader2, X } from 'lucide-react'
 
 export default function AdminMediaPage() {
+  const { addToast } = useToast()
   const [assets, setAssets] = useState<Array<{
     id: string
     fileName: string
@@ -24,8 +27,7 @@ export default function AdminMediaPage() {
   const [altText, setAltText] = useState('')
   const [attribution, setAttribution] = useState('')
 
-  // Mount-time fetch: setState only inside promise callbacks so we never
-  // update state synchronously in the effect body (avoids cascading renders).
+  // Fetch assets on mount only
   useEffect(() => {
     let ignore = false
     getMediaAssets()
@@ -44,13 +46,12 @@ export default function AdminMediaPage() {
     return () => { ignore = true }
   }, [])
 
-  // Refresh the asset list after a mutation (called from event handlers).
-  const refreshAssets = async () => {
+  const refreshAssets = useCallback(async () => {
     const data = await getMediaAssets()
     setAssets(data.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() })))
-  }
+  }, [])
 
-  const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpload = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData()
     const fileInput = e.currentTarget.elements.namedItem('image') as HTMLInputElement
@@ -68,28 +69,43 @@ export default function AdminMediaPage() {
       setShowUpload(false)
       setAltText('')
       setAttribution('')
-      refreshAssets()
+      await refreshAssets()
+      addToast({ type: 'success', message: 'Imagem enviada com sucesso!' })
     } else {
-      alert(result.error)
+      addToast({ type: 'error', message: result.error ?? 'Erro desconhecido' })
     }
-  }
+  }, [altText, attribution, refreshAssets, addToast])
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta imagem?')) return
+  const handleDelete = useCallback(async (id: string, name: string) => {
     setDeleting(id)
     const result = await deleteImageAction(id)
     setDeleting(null)
     if (result.success) {
-      refreshAssets()
+      await refreshAssets()
+      addToast({ type: 'success', message: `${name} excluído com sucesso` })
     } else {
-      alert(result.error)
+      addToast({ type: 'error', message: result.error ?? 'Erro desconhecido' })
     }
-  }
+  }, [refreshAssets, addToast])
 
-  const formatSize = (bytes: number) => {
+  const formatSize = useCallback((bytes: number) => {
     if (bytes < 1024) return `${bytes} B`
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
     return `${(bytes / 1024 / 1024).toFixed(2)} MB`
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4 py-4">
+          <Skeleton className="h-8 w-48" />
+          <div className="ml-auto">
+            <Skeleton className="h-10 w-40" />
+          </div>
+        </div>
+        <CardSkeleton lines={3} />
+      </div>
+    )
   }
 
   return (
@@ -136,11 +152,7 @@ export default function AdminMediaPage() {
       {/* Assets Grid */}
       <section className="card" aria-labelledby="assets-title">
         <h2 id="assets-title" className="sr-only">Imagens cadastradas</h2>
-        {loading ? (
-          <div className="p-12 text-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-          </div>
-        ) : assets.length === 0 ? (
+        {assets.length === 0 ? (
           <div className="p-12 text-center text-charcoal-500">
             <ImageIcon className="h-12 w-12 mx-auto text-charcoal-300 mb-3" aria-hidden="true" />
             <p className="mb-2">Nenhuma imagem enviada</p>
@@ -160,10 +172,10 @@ export default function AdminMediaPage() {
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-3">
-                      <div className="w-full flex justify-between text-white text-xs">
+                      <div className="w-full flex justify-between items-end text-white text-xs">
                         <span className="truncate max-w-[70%]">{asset.altText || asset.originalName || asset.fileName}</span>
                         <button
-                          onClick={() => handleDelete(asset.id)}
+                          onClick={() => handleDelete(asset.id, asset.originalName || asset.fileName)}
                           disabled={deleting === asset.id}
                           className="p-1.5 bg-white/20 backdrop-blur rounded-full hover:bg-white/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                           aria-label={`Excluir ${asset.altText || asset.originalName || asset.fileName}`}
@@ -179,7 +191,7 @@ export default function AdminMediaPage() {
                   </div>
                   <div className="mt-2 text-xs text-charcoal-500">
                     <p className="truncate font-medium">{asset.originalName || asset.fileName}</p>
-                    <p>{formatSize(asset.fileSize)} • {asset.mimeType}</p>
+                    <p>{formatSize(asset.fileSize)} • {asset.mimeType.split('/')[1]?.toUpperCase()}</p>
                   </div>
                 </article>
               ))}

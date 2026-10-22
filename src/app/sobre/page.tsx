@@ -4,6 +4,8 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import { Wheat, Leaf, Coffee, Heart, MapPin, Phone, Baby } from 'lucide-react'
+import Breadcrumb from '@/components/Breadcrumb'
+import { AnimatedSection } from '@/components/AnimatedSection'
 
 export const metadata: Metadata = {
   title: 'Sobre Nós',
@@ -66,15 +68,10 @@ export default async function AboutPage() {
         {/* Page Header */}
         <section className="bg-cream-100 py-16 md:py-24">
           <div className="container">
-            <nav aria-label="Breadcrumb" className="mb-8">
-              <ol className="flex items-center gap-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/" className="hover:text-foreground transition-colors">Início</Link>
-                </li>
-                <li aria-hidden="true"><svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></li>
-                <li aria-current="page" className="text-foreground font-medium">Sobre Nós</li>
-              </ol>
-            </nav>
+            <Breadcrumb items={[
+              { label: 'Início', href: '/' },
+              { label: 'Sobre Nós' },
+            ]} />
             <h1 className="font-heading text-4xl md:text-5xl font-medium tracking-tight mb-4">Sobre a LOMA</h1>
             <p className="text-lg text-charcoal-600 max-w-2xl">
               Cozinha e padaria artesanal onde o ingrediente é o protagonista.
@@ -83,7 +80,10 @@ export default async function AboutPage() {
         </section>
 
         {/* Philosophy */}
-        <section className="py-16 md:py-24 bg-background" aria-labelledby="philosophy-title">
+        <AnimatedSection
+          className="py-20 md:py-28 bg-background"
+          aria-labelledby="philosophy-title"
+        >
           <div className="container">
             <div className="max-w-3xl mx-auto text-center mb-16">
               <span className="text-sm font-medium text-terracotta-600 uppercase tracking-wider mb-3 block">
@@ -97,7 +97,7 @@ export default async function AboutPage() {
               </p>
             </div>
 
-            <div className="prose prose-charcoal max-w-3xl mx-auto space-y-8 text-charcoal-600">
+            <div className="max-w-3xl mx-auto space-y-6 text-charcoal-600">
               <p>
                 A LOMA nasceu do desejo de criar um lugar onde a comida honesta encontra o cuidado artesanal.
                 Não buscamos a complexidade pela complexidade — buscamos o ponto exato onde a técnica
@@ -121,10 +121,13 @@ export default async function AboutPage() {
               </p>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Values */}
-        <section className="py-16 md:py-24 bg-cream-50" aria-labelledby="values-title">
+        <AnimatedSection
+          className="py-20 md:py-28 bg-cream-50"
+          aria-labelledby="values-title"
+        >
           <div className="container">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <span className="text-sm font-medium text-terracotta-600 uppercase tracking-wider mb-3 block">
@@ -137,7 +140,10 @@ export default async function AboutPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {values.map((value) => (
-                <article key={value.title} className="card p-8 text-center">
+                <article
+                  key={value.title}
+                  className="card p-8 text-center hover:shadow-lg transition-shadow"
+                >
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-light text-primary mb-6">
                     <value.icon className="h-7 w-7" aria-hidden="true" />
                   </div>
@@ -147,10 +153,13 @@ export default async function AboutPage() {
               ))}
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Services / Features */}
-        <section className="py-16 md:py-24 bg-background" aria-labelledby="services-title">
+        <AnimatedSection
+          className="py-20 md:py-28 bg-background"
+          aria-labelledby="services-title"
+        >
           <div className="container">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <span className="text-sm font-medium text-terracotta-600 uppercase tracking-wider mb-3 block">
@@ -208,10 +217,13 @@ export default async function AboutPage() {
               </article>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Visit CTA */}
-        <section className="py-16 md:py-24 bg-charcoal-900 text-cream-50" aria-labelledby="visit-cta-title">
+        <AnimatedSection
+          className="py-20 md:py-28 bg-charcoal-900 text-cream-50"
+          aria-labelledby="visit-cta-title"
+        >
           <div className="container">
             <div className="max-w-3xl mx-auto text-center">
               <h2 id="visit-cta-title" className="font-heading text-3xl md:text-4xl font-medium tracking-tight mb-6">
@@ -236,7 +248,7 @@ export default async function AboutPage() {
               </div>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
       </main>
       <Footer
         businessName={businessName}
