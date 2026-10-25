@@ -85,6 +85,45 @@
   --color-destructive: var(--color-terracotta-600);
   --color-focus: var(--color-brand-blue-500);
 
+  /* Theme-aware surfaces (alternate section backgrounds) */
+  --color-surface: var(--color-cream-100);
+  --color-surface-soft: var(--color-cream-50);
+
+  /* CTA band (dark band in light mode, warm band in dark mode) */
+  --cta-band-bg: var(--color-charcoal-900);
+  --cta-band-foreground: var(--color-cream-50);
+  --cta-band-soft: var(--color-cream-300);
+
+  /* Feedback & selection */
+  --selection-bg: var(--color-terracotta-200);
+  --selection-color: var(--color-charcoal-900);
+  --focus-ring: var(--color-brand-blue-100);
+  --focus-ring-error: var(--color-terracotta-100);
+  --btn-secondary-hover-border: var(--color-charcoal-300);
+
+  /* Hero ambient glows */
+  --hero-glow-a: color-mix(in oklab, var(--color-terracotta-200) 55%, transparent);
+  --hero-glow-b: color-mix(in oklab, var(--color-sage-300) 40%, transparent);
+
+  /* Decorative panels (philosophy placeholder) */
+  --panel-gradient-a: var(--color-terracotta-100);
+  --panel-gradient-b: var(--color-sage-100);
+
+  /* Menu item tags */
+  --tag-vegan-text: var(--color-sage-700);
+  --tag-vegan-bg: var(--color-sage-100);
+  --tag-child-text: var(--color-terracotta-700);
+  --tag-child-bg: var(--color-terracotta-100);
+  --tag-unavailable-text: var(--color-charcoal-500);
+  --tag-unavailable-bg: var(--color-charcoal-100);
+
+  /* Callout notices (e.g. gallery empty state) */
+  --notice-text: var(--color-terracotta-800);
+
+  /* Open/closed status accents */
+  --status-open-border: var(--color-sage-300);
+  --status-closed-border: var(--color-terracotta-300);
+
   /* Typography - Editorial serif for headings, clean sans for UI */
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
@@ -129,8 +168,56 @@
   --transition-slow: 350ms ease;
 }
 
+/* Manual theme override — ThemeToggle sets `data-theme` on <html> */
+:root[data-theme="dark"] {
+  --color-background: var(--color-charcoal-950);
+  --color-foreground: var(--color-cream-50);
+  --color-muted: var(--color-charcoal-800);
+  --color-muted-foreground: var(--color-charcoal-400);
+  --color-border: var(--color-charcoal-700);
+  --color-primary: var(--color-terracotta-400);
+  --color-primary-hover: var(--color-terracotta-300);
+  --color-primary-light: var(--color-terracotta-900);
+  --color-secondary: var(--color-sage-400);
+  --color-secondary-hover: var(--color-sage-300);
+  --color-accent: var(--color-brand-blue-400);
+
+  --color-surface: var(--color-charcoal-900);
+  --color-surface-soft: var(--color-charcoal-950);
+
+  --cta-band-bg: var(--color-terracotta-950);
+  --cta-band-foreground: var(--color-cream-50);
+  --cta-band-soft: var(--color-terracotta-200);
+
+  --selection-bg: var(--color-terracotta-800);
+  --selection-color: var(--color-cream-50);
+  --focus-ring: var(--color-brand-blue-900);
+  --focus-ring-error: var(--color-terracotta-900);
+  --btn-secondary-hover-border: var(--color-charcoal-500);
+
+  --hero-glow-a: color-mix(in oklab, var(--color-terracotta-500) 16%, transparent);
+  --hero-glow-b: color-mix(in oklab, var(--color-sage-500) 14%, transparent);
+
+  --panel-gradient-a: var(--color-terracotta-900);
+  --panel-gradient-b: var(--color-sage-900);
+
+  --tag-vegan-text: var(--color-sage-300);
+  --tag-vegan-bg: color-mix(in oklab, var(--color-sage-900) 65%, transparent);
+  --tag-child-text: var(--color-terracotta-300);
+  --tag-child-bg: color-mix(in oklab, var(--color-terracotta-900) 65%, transparent);
+  --tag-unavailable-text: var(--color-charcoal-400);
+  --tag-unavailable-bg: var(--color-charcoal-800);
+
+  --notice-text: var(--color-terracotta-300);
+
+  --status-open-border: var(--color-sage-500);
+  --status-closed-border: var(--color-terracotta-500);
+}
+
+/* System dark fallback: applies when the user has no explicit choice
+   (e.g. JavaScript disabled, so data-theme is never set) */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --color-background: var(--color-charcoal-950);
     --color-foreground: var(--color-cream-50);
     --color-muted: var(--color-charcoal-800);
@@ -142,6 +229,37 @@
     --color-secondary: var(--color-sage-400);
     --color-secondary-hover: var(--color-sage-300);
     --color-accent: var(--color-brand-blue-400);
+
+    --color-surface: var(--color-charcoal-900);
+    --color-surface-soft: var(--color-charcoal-950);
+
+    --cta-band-bg: var(--color-terracotta-950);
+    --cta-band-foreground: var(--color-cream-50);
+    --cta-band-soft: var(--color-terracotta-200);
+
+    --selection-bg: var(--color-terracotta-800);
+    --selection-color: var(--color-cream-50);
+    --focus-ring: var(--color-brand-blue-900);
+    --focus-ring-error: var(--color-terracotta-900);
+    --btn-secondary-hover-border: var(--color-charcoal-500);
+
+    --hero-glow-a: color-mix(in oklab, var(--color-terracotta-500) 16%, transparent);
+    --hero-glow-b: color-mix(in oklab, var(--color-sage-500) 14%, transparent);
+
+    --panel-gradient-a: var(--color-terracotta-900);
+    --panel-gradient-b: var(--color-sage-900);
+
+    --tag-vegan-text: var(--color-sage-300);
+    --tag-vegan-bg: color-mix(in oklab, var(--color-sage-900) 65%, transparent);
+    --tag-child-text: var(--color-terracotta-300);
+    --tag-child-bg: color-mix(in oklab, var(--color-terracotta-900) 65%, transparent);
+    --tag-unavailable-text: var(--color-charcoal-400);
+    --tag-unavailable-bg: var(--color-charcoal-800);
+
+    --notice-text: var(--color-terracotta-300);
+
+    --status-open-border: var(--color-sage-500);
+    --status-closed-border: var(--color-terracotta-500);
   }
 }
 
@@ -264,6 +382,16 @@
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
+
+  /* Surfaces & bands */
+  --color-surface: var(--color-surface);
+  --color-surface-soft: var(--color-surface-soft);
+  --color-cta-band: var(--cta-band-bg);
+  --color-cta-band-foreground: var(--cta-band-foreground);
+  --color-cta-band-soft: var(--cta-band-soft);
+
+  /* Custom helpers */
+  --color-notice: var(--notice-text);
 }
 
 /* Base styles */
@@ -290,15 +418,8 @@ body {
 
 /* Selection */
 ::selection {
-  background-color: var(--color-terracotta-200);
-  color: var(--color-charcoal-900);
-}
-
-@media (prefers-color-scheme: dark) {
-  ::selection {
-    background-color: var(--color-terracotta-800);
-    color: var(--color-cream-50);
-  }
+  background-color: var(--selection-bg);
+  color: var(--selection-color);
 }
 
 /* Focus visible */
@@ -397,13 +518,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--color-muted);
-  border-color: var(--color-charcoal-300);
-}
-
-@media (prefers-color-scheme: dark) {
-  .btn-secondary:hover:not(:disabled) {
-    border-color: var(--color-charcoal-500);
-  }
+  border-color: var(--btn-secondary-hover-border);
 }
 
 .btn-outline {
@@ -424,6 +539,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-ghost:hover:not(:disabled) {
   background-color: var(--color-muted);
+}
+
+/* CTA-band outline button (used on the inverted call-to-action band) */
+.btn-band {
+  background-color: transparent;
+  color: var(--cta-band-foreground);
+  border-color: color-mix(in oklab, var(--cta-band-soft) 40%, transparent);
+}
+
+.btn-band:hover:not(:disabled) {
+  background-color: color-mix(in oklab, var(--cta-band-soft) 15%, transparent);
 }
 
 .btn-sm {
@@ -452,13 +578,7 @@ h1, h2, h3, h4, h5, h6 {
 .input:focus {
   outline: none;
   border-color: var(--color-focus);
-  box-shadow: 0 0 0 3px var(--color-brand-blue-100);
-}
-
-@media (prefers-color-scheme: dark) {
-  .input:focus {
-    box-shadow: 0 0 0 3px var(--color-brand-blue-900);
-  }
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .input::placeholder {
@@ -470,13 +590,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .input-error:focus {
-  box-shadow: 0 0 0 3px var(--color-terracotta-100);
-}
-
-@media (prefers-color-scheme: dark) {
-  .input-error:focus {
-    box-shadow: 0 0 0 3px var(--color-terracotta-900);
-  }
+  box-shadow: 0 0 0 3px var(--focus-ring-error);
 }
 
 .label {
@@ -507,11 +621,12 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
+  transition: box-shadow var(--transition-normal), border-color var(--transition-normal), transform var(--transition-normal), background-color var(--transition-normal);
 }
 
 .card:hover {
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 /* Image */
@@ -588,4 +703,88 @@ h1, h2, h3, h4, h5, h6 {
   clip: rect(0, 0, 0, 0) !important;
   white-space: nowrap !important;
   border: 0 !important;
+}
+
+/* ─── Polished utilities ───────────────────────── */
+
+/* Scroll offset so sticky nav doesn't cover section anchors */
+[id] { scroll-margin-top: 6.5rem; }
+
+/* Underline-hover link (used on nav & footer links) */
+.link-underline { position: relative; }
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1.5px;
+  background: currentColor;
+  opacity: 0.45;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform var(--transition-normal);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after { transform: scaleX(1); }
+
+/* Shimmer placeholder for lazy-loaded images */
+.img-shimmer { position: relative; overflow: hidden; background-color: var(--color-muted); }
+.img-shimmer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 33%, color-mix(in oklab, var(--color-foreground) 6%, transparent) 50%, transparent 67%);
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+@keyframes shimmer { from { transform: translateX(-100%) } to { transform: translateX(100%) } }
+
+/* Hero ambient blobs */
+.hero-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  will-change: transform;
+  animation: blob-drift 22s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.hero-blob-a { background-color: color-mix(in oklab, var(--color-terracotta-400) 38%, transparent); }
+.hero-blob-b { background-color: color-mix(in oklab, var(--color-sage-400) 30%, transparent); }
+@keyframes blob-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(4%, -4%, 0) scale(1.07); }
+  100% { transform: translate3d(-5%, 3%, 0) scale(0.97); }
+}
+.hero-bg {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 10%, var(--hero-glow-a), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 80% 90%, var(--hero-glow-b), transparent 60%),
+    var(--color-background);
+}
+
+/* Hero entrance animation (respects prefers-reduced-motion) */
+.hero-enter { opacity: 0; transform: translateY(16px); animation: hero-enter 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.hero-enter-delay-1 { animation-delay: 100ms; }
+.hero-enter-delay-2 { animation-delay: 180ms; }
+.hero-enter-delay-3 { animation-delay: 260ms; }
+@keyframes hero-enter { to { opacity: 1; transform: translateY(0); } }
+
+/* Tagged pills (menu item badges) */
+.tag { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; line-height: 1.25; }
+.tag-vegan      { color: var(--tag-vegan-text); background-color: var(--tag-vegan-bg); }
+.tag-child      { color: var(--tag-child-text); background-color: var(--tag-child-bg); }
+.tag-unavailable { color: var(--tag-unavailable-text); background-color: var(--tag-unavailable-bg); }
+
+/* Decorative panel gradient */
+.panel-gradient { background-image: linear-gradient(135deg, var(--panel-gradient-a), var(--panel-gradient-b)); }
+
+/* Smooth theme-switch transition (skipped when user prefers reduced motion) */
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: background-color 200ms ease, background 200ms ease,
+                border-color 200ms ease, color 200ms ease,
+                fill 200ms ease, stroke 200ms ease !important;
+  }
 }

@@ -53,19 +53,19 @@ export default function MenuPageClient({
   return (
     <div>
       {/* Page Header */}
-      <section className="bg-cream-100 py-16 md:py-24">
+      <section className="bg-surface-soft py-16 md:py-24">
         <div className="container">
           <nav aria-label="Breadcrumb" className="mb-8">
             <ol className="flex items-center gap-2 text-sm text-muted-foreground">
               <li>
-                <Link href="/" className="hover:text-foreground transition-colors">Início</Link>
+                <Link href="/" className="hover:text-foreground transition-colors link-underline">Início</Link>
               </li>
               <li aria-hidden="true"><ChevronRight className="h-4 w-4" /></li>
               <li aria-current="page" className="text-foreground font-medium">Cardápio</li>
             </ol>
           </nav>
           <h1 className="font-heading text-4xl md:text-5xl font-medium tracking-tight mb-4">Nosso Cardápio</h1>
-          <p className="text-lg text-charcoal-600 max-w-2xl">
+          <p className="text-lg text-muted-foreground max-w-2xl">
             Produtos artesanais feitos com ingredientes naturais, selecionados com cuidado.
             Escolha uma categoria abaixo para explorar.
           </p>
@@ -126,8 +126,8 @@ export default function MenuPageClient({
                 </svg>
               </div>
               <h3 className="font-heading text-2xl font-medium mb-2">Nenhum item nesta categoria</h3>
-              <p className="text-charcoal-600">
-                Confira outras categorias ou volte em breve para novidades.
+              <p className="text-muted-foreground">
+               Confira outras categorias ou volte em breve para novidades.
               </p>
             </div>
           ) : (
@@ -137,7 +137,7 @@ export default function MenuPageClient({
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
                 className="space-y-12"
                 role="list"
                 aria-label="Categorias do cardápio"
@@ -146,7 +146,7 @@ export default function MenuPageClient({
                   <article
                     key={category.id}
                     id={category.slug}
-                    className="category-section"
+                    className="category-section scroll-mt-24"
                     role="listitem"
                     aria-labelledby={`cat-${category.slug}`}
                   >
@@ -155,12 +155,12 @@ export default function MenuPageClient({
                         {category.name}
                       </h3>
                       {category.description && (
-                        <p className="text-charcoal-600 mt-2">{category.description}</p>
+                        <p className="text-muted-foreground mt-2">{category.description}</p>
                       )}
                     </header>
 
                     {category.menuItems.length === 0 ? (
-                      <p className="text-charcoal-500 text-center py-8">
+                      <p className="text-muted-foreground/80 text-center py-8">
                         Nenhum item publicado nesta categoria.
                       </p>
                     ) : (
@@ -172,7 +172,7 @@ export default function MenuPageClient({
                             role="listitem"
                           >
                             {item.imagePath && (
-                              <div className="aspect-[4/3] overflow-hidden relative bg-muted">
+                              <div className="aspect-[4/3] overflow-hidden relative bg-muted img-shimmer">
                                 <Image
                                   src={item.imagePath}
                                   alt={item.imageAlt || item.name}
@@ -190,23 +190,23 @@ export default function MenuPageClient({
                                 </span>
                               </div>
                               {item.description && (
-                                <p className="text-charcoal-600 text-sm mb-4 line-clamp-2">{item.description}</p>
+                                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{item.description}</p>
                               )}
                               <div className="flex flex-wrap gap-2">
                                 {item.isVegan && (
-                                  <span className="px-2.5 py-1 text-xs font-medium text-sage-700 bg-sage-100 rounded-full flex items-center gap-1">
+                                  <span className="tag tag-vegan">
                                     <Leaf className="h-3 w-3" aria-hidden="true" />
                                     Vegano
                                   </span>
                                 )}
                                 {item.isChildFriendly && (
-                                  <span className="px-2.5 py-1 text-xs font-medium text-terracotta-700 bg-terracotta-100 rounded-full flex items-center gap-1">
+                                  <span className="tag tag-child">
                                     <Baby className="h-3 w-3" aria-hidden="true" />
                                     Infantil
                                   </span>
                                 )}
                                 {!item.available && (
-                                  <span className="px-2.5 py-1 text-xs font-medium text-charcoal-500 bg-charcoal-100 rounded-full">
+                                  <span className="tag tag-unavailable">
                                     Indisponível
                                   </span>
                                 )}

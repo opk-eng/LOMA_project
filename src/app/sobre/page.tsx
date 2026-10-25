@@ -86,18 +86,18 @@ export default async function AboutPage() {
         >
           <div className="container">
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <span className="text-sm font-medium text-terracotta-600 uppercase tracking-wider mb-3 block">
+              <span className="text-sm font-medium text-primary uppercase tracking-wider mb-3 block">
                 Nossa Filosofia
               </span>
               <h2 id="philosophy-title" className="font-heading text-3xl md:text-4xl font-medium tracking-tight mb-6">
                 &ldquo;Somos aficionados por servir o simples de forma extraordinária.&rdquo;
               </h2>
-              <p className="text-lg text-charcoal-600 text-pretty">
+              <p className="text-lg text-muted-foreground text-pretty">
                 {brandDescription}
               </p>
             </div>
 
-            <div className="max-w-3xl mx-auto space-y-6 text-charcoal-600">
+            <div className="max-w-3xl mx-auto space-y-6 text-muted-foreground">
               <p>
                 A LOMA nasceu do desejo de criar um lugar onde a comida honesta encontra o cuidado artesanal.
                 Não buscamos a complexidade pela complexidade — buscamos o ponto exato onde a técnica
@@ -125,12 +125,12 @@ export default async function AboutPage() {
 
         {/* Values */}
         <AnimatedSection
-          className="py-20 md:py-28 bg-cream-50"
+          className="py-20 md:py-28 bg-surface-soft"
           aria-labelledby="values-title"
         >
           <div className="container">
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="text-sm font-medium text-terracotta-600 uppercase tracking-wider mb-3 block">
+              <span className="text-sm font-medium text-primary uppercase tracking-wider mb-3 block">
                 O que nos guia
               </span>
               <h2 id="values-title" className="font-heading text-3xl md:text-4xl font-medium tracking-tight">
@@ -142,13 +142,13 @@ export default async function AboutPage() {
               {values.map((value) => (
                 <article
                   key={value.title}
-                  className="card p-8 text-center hover:shadow-lg transition-shadow"
+                  className="card p-8 text-center group"
                 >
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-light text-primary mb-6">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-light text-primary mb-6 group-hover:scale-105 transition-transform duration-300">
                     <value.icon className="h-7 w-7" aria-hidden="true" />
                   </div>
                   <h3 className="font-heading text-lg font-medium mb-3">{value.title}</h3>
-                  <p className="text-charcoal-600 text-sm">{value.description}</p>
+                  <p className="text-muted-foreground text-sm">{value.description}</p>
                 </article>
               ))}
             </div>
@@ -162,7 +162,7 @@ export default async function AboutPage() {
         >
           <div className="container">
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <span className="text-sm font-medium text-terracotta-600 uppercase tracking-wider mb-3 block">
+              <span className="text-sm font-medium text-primary uppercase tracking-wider mb-3 block">
                 Serviços
               </span>
               <h2 id="services-title" className="font-heading text-3xl md:text-4xl font-medium tracking-tight">
@@ -173,12 +173,12 @@ export default async function AboutPage() {
             <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <article className="card p-8">
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-terracotta-100 flex items-center justify-center">
-                    <MapPin className="h-6 w-6 text-terracotta-600" aria-hidden="true" />
+                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center">
+                    <MapPin className="h-6 w-6 text-primary" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="font-heading text-lg font-medium mb-2">Área Externa</h3>
-                    <p className="text-charcoal-600">
+                    <p className="text-muted-foreground">
                       Mesas ao ar livre para aproveitar o clima de Brasília, seja no café da manhã
                       ensolarado ou no fim de tarde.
                     </p>
@@ -193,7 +193,7 @@ export default async function AboutPage() {
                   </div>
                   <div>
                     <h3 className="font-heading text-lg font-medium mb-2">Opções Veganas</h3>
-                    <p className="text-charcoal-600">
+                    <p className="text-muted-foreground">
                       Pratos 100% vegetais no cardápio fixo, além de alternativas veganas para
                       vários itens. Consulte nossa equipe.
                     </p>
@@ -208,7 +208,7 @@ export default async function AboutPage() {
                   </div>
                   <div>
                     <h3 className="font-heading text-lg font-medium mb-2">Menu Infantil</h3>
-                    <p className="text-charcoal-600">
+                    <p className="text-muted-foreground">
                       Opções pensadas para os pequenos: porções adequadas, sabores suaves e
                       ingredientes nutritivos.
                     </p>
@@ -221,7 +221,7 @@ export default async function AboutPage() {
 
         {/* Visit CTA */}
         <AnimatedSection
-          className="py-20 md:py-28 bg-charcoal-900 text-cream-50"
+          className="py-20 md:py-28 bg-cta-band text-cta-band-foreground"
           aria-labelledby="visit-cta-title"
         >
           <div className="container">
@@ -229,18 +229,18 @@ export default async function AboutPage() {
               <h2 id="visit-cta-title" className="font-heading text-3xl md:text-4xl font-medium tracking-tight mb-6">
                 Venha nos conhecer
               </h2>
-              <p className="text-cream-300 text-lg mb-10">
+              <p className="text-cta-band-soft text-lg mb-10">
                 Estamos na Asa Norte, de portas abertas todos os dias. Venha tomar um café,
                 experimentar nossos pães ou almoçar conosco.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/visite-nos" className="btn btn-primary btn-lg">
+                <Link href="/visite-nos" className="btn btn-primary btn-lg link-underline">
                   <MapPin className="h-5 w-5" aria-hidden="true" />
                   Ver Endereço e Rotas
                 </Link>
                 <a
                   href={`tel:${phone.replace(/\s/g, '')}`}
-                  className="btn btn-outline btn-lg bg-transparent border-cream-300 text-cream-50 hover:bg-cream-100 hover:text-charcoal-900"
+                  className="btn btn-band btn-lg"
                 >
                   <Phone className="h-5 w-5" aria-hidden="true" />
                   Ligar: {phone}

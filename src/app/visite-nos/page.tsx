@@ -45,19 +45,19 @@ export default async function VisitPage() {
       <Header phone={phone} instagramUrl={instagramUrl} />
       <main id="main-content" className="flex-1 pt-16">
         {/* Page Header */}
-        <section className="bg-cream-100 py-16 md:py-24">
+        <section className="bg-surface-soft py-16 md:py-24">
           <div className="container">
             <nav aria-label="Breadcrumb" className="mb-8">
               <ol className="flex items-center gap-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/" className="hover:text-foreground transition-colors">Início</Link>
+                  <Link href="/" className="hover:text-foreground transition-colors link-underline">Início</Link>
                 </li>
                 <li aria-hidden="true"><ChevronRight className="h-4 w-4" /></li>
                 <li aria-current="page" className="text-foreground font-medium">Visite-nos</li>
               </ol>
             </nav>
             <h1 className="font-heading text-4xl md:text-5xl font-medium tracking-tight mb-4">Venha nos visitar</h1>
-            <p className="text-lg text-charcoal-600 max-w-2xl">
+            <p className="text-lg text-muted-foreground max-w-2xl">
               Estamos na Asa Norte, de portas abertas todos os dias. Venha tomar um café,
               experimentar nossos pães ou almoçar conosco.
             </p>
@@ -81,7 +81,7 @@ export default async function VisitPage() {
                       <MapPin className="h-5 w-5 text-primary" aria-hidden="true" />
                       Endereço
                     </h3>
-                    <p className="text-charcoal-600">{address}</p>
+                    <p className="text-muted-foreground">{address}</p>
                   </div>
 
                   <div>
@@ -91,7 +91,7 @@ export default async function VisitPage() {
                     </h3>
                     <a
                       href={`tel:${phone.replace(/\s/g, '')}`}
-                      className="text-charcoal-600 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm inline-flex items-center gap-2"
+                      className="text-muted-foreground hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm inline-flex items-center gap-2"
                     >
                       {phone}
                     </a>
@@ -106,7 +106,7 @@ export default async function VisitPage() {
                       href={instagramUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-charcoal-600 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm inline-flex items-center gap-2"
+                      className="text-muted-foreground hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 rounded-sm inline-flex items-center gap-2"
                     >
                       @lomacozinha
                       <ExternalLink className="h-4 w-4" aria-hidden="true" />
@@ -153,7 +153,7 @@ export default async function VisitPage() {
                         {todaysHours.isOpen ? 'Aberto agora' : 'Fechado no momento'}
                       </span>
                     </div>
-                    <p className="text-charcoal-600">
+                    <p className="text-muted-foreground">
                       {todaysHours.isOpen
                         ? `Aberto até ${todaysHours.close} (horário de Brasília)`
                         : `Abre hoje às ${todaysHours.open} (horário de Brasília)`}
@@ -169,10 +169,10 @@ export default async function VisitPage() {
                   {weekHours.map((day) => (
                     <div
                       key={day.label}
-                      className="flex items-center justify-between py-3 px-4 bg-cream-50 rounded-lg"
+                      className="flex items-center justify-between py-3 px-4 bg-surface rounded-lg"
                       role="listitem"
                     >
-                      <dt className="font-medium text-charcoal-900">{day.label}</dt>
+                      <dt className="font-medium text-foreground">{day.label}</dt>
                       <dd className="font-mono text-sm font-medium text-primary whitespace-nowrap">{day.formatted}</dd>
                     </div>
                   ))}
@@ -204,7 +204,7 @@ export default async function VisitPage() {
 
         {/* Map CTA */}
         <AnimatedSection
-          className="py-20 md:py-28 bg-cream-50"
+          className="py-20 md:py-28 bg-surface-soft"
           aria-labelledby="map-title"
         >
           <div className="container">
@@ -212,7 +212,7 @@ export default async function VisitPage() {
               <h2 id="map-title" className="font-heading text-3xl md:text-4xl font-medium tracking-tight mb-6">
                 Fácil de chegar
               </h2>
-              <p className="text-charcoal-600 text-lg mb-10">
+              <p className="text-muted-foreground text-lg mb-10">
                 Estamos na CLN 303, Bloco B, Loja 6 — no coração da Asa Norte.
                 Próximo à W3 Norte, com estacionamento rotativo na rua e acesso fácil de transporte público.
               </p>
@@ -221,14 +221,14 @@ export default async function VisitPage() {
                   href={directionsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary btn-lg"
+                  className="btn btn-primary btn-lg link-underline"
                 >
                   <MapPin className="h-5 w-5" aria-hidden="true" />
                   Traçar Rota no Google Maps
                 </a>
-                <Link href="/cardapio" className="btn btn-outline btn-lg">
+                <Link href="/cardapio" className="btn btn-outline btn-lg group link-underline">
                   Ver Cardápio Antes de Vir
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </Link>
               </div>
             </div>

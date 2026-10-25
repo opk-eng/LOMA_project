@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { getBusinessSettings } from '@/lib/public-data'
 import './globals.css'
+import MotionProvider from '@/components/MotionProvider'
 
 // This site is data-driven (Prisma). Every page reads live business settings,
 // categories and menu items. Admin edits must reflect on the public site
@@ -95,6 +96,14 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR" className="h-full antialiased">
       <head>
+        {/* Bootstrap `data-theme` before first paint so the CSS tokens are
+            already correct — avoids flash of wrong theme. Runs inline in
+            the head, reads localStorage then falls back to system preference. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(d,w,m){try{var t=w.localStorage.getItem('loma-theme');if(t==='light'||t==='dark'){d.setAttribute('data-theme',t);return;}d.setAttribute('data-theme',m?'dark':'light');}catch(e){d.setAttribute('data-theme','light');}})(document,window,window.matchMedia('(prefers-color-scheme: dark)').matches);`,
+          }}
+        />
         {structuredData && (
           <script
             type="application/ld+json"
@@ -108,7 +117,7 @@ export default async function RootLayout({
         <a href="#main-content" className="skip-link">
           Pular para o conteúdo principal
         </a>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   )

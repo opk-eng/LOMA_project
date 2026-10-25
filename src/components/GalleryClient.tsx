@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { ChevronRight, Camera, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronRight, Camera, X, ChevronLeft } from 'lucide-react'
 
 interface MediaAsset {
   id: string
@@ -16,24 +17,59 @@ interface MediaAsset {
 
 export default function GalleryClient({ initialAssets }: { initialAssets: MediaAsset[] }) {
   const [selectedAsset, setSelectedAsset] = useState<MediaAsset | null>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
+
+  const selectedIndex = selectedAsset
+    ? initialAssets.findIndex((a) => a.id === selectedAsset.id)
+    : -1
 
   const closeLightbox = useCallback(() => {
     setSelectedAsset(null)
     document.body.style.overflow = ''
   }, [])
 
-  const openLightbox = useCallback((asset: MediaAsset) => {
-    setSelectedAsset(asset)
-    document.body.style.overflow = 'hidden'
-  }, [])
+  const openLightbox = useCallback(
+    (asset: MediaAsset) => {
+      setSelectedAsset(asset)
+      document.body.style.overflow = 'hidden'
+    },
+    [],
+  )
 
+  const step = useCallback(
+    (dir: 1 | -1) => {
+      if (initialAssets.length === 0) return
+      const nextIndex = (selectedIndex + dir + initialAssets.length) % initialAssets.length
+      setSelectedAsset(initialAssets[nextIndex])
+    },
+    [initialAssets, selectedIndex],
+  )
+
+  // Keyboard: Escape closes, arrows navigate
   useEffect(() => {
+    if (!selectedAsset) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeLightbox()
+      else if (e.key === 'ArrowRight' && initialAssets.length > 1) step(1)
+      else if (e.key === 'ArrowLeft' && initialAssets.length > 1) step(-1)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [closeLightbox])
+  }, [selectedAsset, closeLightbox, step, initialAssets.length])
+
+  // Move focus into the dialog when it opens
+  useEffect(() => {
+    if (selectedAsset) {
+      closeRef.current?.focus()
+    }
+  }, [selectedAsset])
+
+  // Restore scroll if the component unmounts with the lightbox open
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
 
   return (
     <>
@@ -50,15 +86,15 @@ export default function GalleryClient({ initialAssets }: { initialAssets: MediaA
                 </svg>
               </div>
               <h3 className="font-heading text-2xl font-medium mb-2">Galeria vazia</h3>
-              <p className="text-charcoal-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 Ainda não há imagens publicadas. Administradores podem fazer upload no painel.
               </p>
-              <div className="bg-terracotta-50 border border-terracotta-200 rounded-lg p-6 max-w-md mx-auto text-left">
-                <p className="text-sm text-terracotta-800 mb-2">
+              <div className="bg-primary-light/60 border border-primary/20 rounded-lg p-6 max-w-md mx-auto text-left">
+                <p className="text-sm text-notice mb-2">
                   <strong>Nota sobre direitos de imagem:</strong> Priorizamos fotografias oficiais da LOMA
                   do Instagram (com autorização) ou fornecidas diretamente pelo estabelecimento.
                 </p>
-                <p className="text-sm text-terracotta-700">
+                <p className="text-sm text-notice/80">
                   Não usamos imagens de outros estabelecimentos nem placeholders como se fossem oficiais.
                   As imagens aqui devem ser autorizadas pelo proprietário.
                 </p>
@@ -71,19 +107,20 @@ export default function GalleryClient({ initialAssets }: { initialAssets: MediaA
                 role="list"
                 aria-label="Imagens da galeria"
               >
-                {initialAssets.map((asset) => (
+                {initialAssets.map((asset, idx) => (
                   <button
                     key={asset.id}
-                    className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted group cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+                    className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted group cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 img-shimmer"
                     onClick={() => openLightbox(asset)}
                     aria-label={`Ampliar ${asset.altText || asset.originalName || asset.fileName}`}
                   >
                     <Image
                       src={`/uploads/${asset.fileName}`}
-                      alt={asset.altText || `Imagem da galeria LOMA`}
+                      alt={asset.altText || `Imagem da galeria LOMA ${idx + 1}`}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      priority={idx < 4}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </button>
@@ -92,14 +129,14 @@ export default function GalleryClient({ initialAssets }: { initialAssets: MediaA
 
               {/* Camera link */}
               <div className="text-center mt-12 pt-8 border-t border-border">
-                <p className="text-charcoal-600 mb-4">
+                <p className="text-muted-foreground mb-4">
                   Acompanhe mais no nosso Instagram:
                 </p>
                 <a
                   href="https://www.instagram.com/lomacozinha/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-outline inline-flex items-center gap-2"
+                  className="btn btn-outline inline-flex items-center gap-2 link-underline"
                   aria-label="Instagram do LOMA"
                 >
                   <Camera className="h-5 w-5" aria-hidden="true" />
@@ -113,38 +150,84 @@ export default function GalleryClient({ initialAssets }: { initialAssets: MediaA
       </section>
 
       {/* Lightbox */}
-      {selectedAsset && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
-          onClick={closeLightbox}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Visualização ampliada da imagem"
-        >
-          <button
+      <AnimatePresence>
+        {selectedAsset && (
+          <motion.div
+            key="lightbox"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={closeLightbox}
-            className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full bg-black/50"
-            aria-label="Fechar"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Visualização ampliada da imagem"
           >
-            <X className="h-6 w-6" aria-hidden="true" />
-          </button>
-          <div className="relative max-w-5xl max-h-[85vh] w-full" onClick={(e) => e.stopPropagation()}>
-            <Image
-              src={`/uploads/${selectedAsset.fileName}`}
-              alt={selectedAsset.altText || selectedAsset.originalName || 'Imagem da galeria LOMA'}
-              width={1200}
-              height={800}
-              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
-              priority
-            />
-            {(selectedAsset.altText || selectedAsset.originalName) && (
-              <p className="text-white/70 text-sm text-center mt-3 max-w-xl mx-auto">
-                {selectedAsset.altText || selectedAsset.originalName}
-              </p>
+            <button
+              ref={closeRef}
+              onClick={closeLightbox}
+              className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full bg-black/50"
+              aria-label="Fechar"
+            >
+              <X className="h-6 w-6" aria-hidden="true" />
+            </button>
+
+            {initialAssets.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    step(-1)
+                  }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-white/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full bg-black/50"
+                  aria-label="Imagem anterior"
+                >
+                  <ChevronLeft className="h-6 w-6" aria-hidden="true" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    step(1)
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full bg-black/50"
+                  aria-label="Próxima imagem"
+                >
+                  <ChevronRight className="h-6 w-6" aria-hidden="true" />
+                </button>
+              </>
             )}
-          </div>
-        </div>
-      )}
+
+            <motion.div
+              key={selectedAsset.id}
+              className="relative max-w-5xl max-h-[85vh] w-full"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={`/uploads/${selectedAsset.fileName}`}
+                alt={selectedAsset.altText || selectedAsset.originalName || 'Imagem da galeria LOMA'}
+                width={1200}
+                height={800}
+                className="w-full h-auto max-h-[75vh] object-contain rounded-lg"
+                priority
+              />
+              {(selectedAsset.altText || selectedAsset.originalName) && (
+                <p className="text-white/70 text-sm text-center mt-3 max-w-xl mx-auto">
+                  {selectedAsset.altText || selectedAsset.originalName}
+                </p>
+              )}
+              {initialAssets.length > 1 && (
+                <p className="text-white/40 text-xs text-center mt-2 font-mono">
+                  {selectedIndex + 1} de {initialAssets.length}
+                </p>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

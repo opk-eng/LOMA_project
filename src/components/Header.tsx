@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { Menu, X, Phone, Camera } from 'lucide-react'
 import Logo from '@/components/Logo'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const navigation = [
   { name: 'Início', href: '/' },
@@ -102,25 +103,29 @@ export default function Header({ phone, instagramUrl }: HeaderProps) {
               >
                 <Camera className="h-4 w-4" aria-hidden="true" />
               </a>
+              <ThemeToggle />
             </div>
           </div>
 
           {/* Mobile menu button */}
-          <button
-            type="button"
-            className="md:hidden flex items-center justify-center p-2 rounded-md text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-menu"
-            aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <span className="sr-only">{mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}</span>
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" aria-hidden="true" />
-            ) : (
-              <Menu className="h-6 w-6" aria-hidden="true" />
-            )}
-          </button>
+          <div className="md:hidden flex items-center gap-1">
+            <ThemeToggle className="md:hidden" />
+            <button
+              type="button"
+              className="flex items-center justify-center p-2 rounded-md text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <span className="sr-only">{mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}</span>
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" aria-hidden="true" />
+              ) : (
+                <Menu className="h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
